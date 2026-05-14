@@ -47,7 +47,7 @@ export function getTileImagePath(suit: TileSuit, value: TileValue): string {
     return ''
   }
   const valueNum = typeof value === 'number' ? value : parseInt(value as string) || 0
-  return `/mahjong-game/assets/tiles/${suit}/${valueNum}.svg`
+  return `/mahjong-game/tiles/${suit}/${valueNum}.svg`
 }
 
 export function createTile(suit: TileSuit, value: TileValue, emoji: string, index: number): Tile {
