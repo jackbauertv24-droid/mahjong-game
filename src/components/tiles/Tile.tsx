@@ -34,7 +34,7 @@ export function TileComponent({ tile, onClick, isSelected, disabled, size = 'nor
         transform: isSelected ? 'translateY(-8px) rotateX(10deg)' : undefined,
       }}
     >
-      <div className="text-2xl sm:text-3xl md:text-4xl">
+      <div className="text-4xl sm:text-5xl md:text-6xl">
         {tile.emoji}
       </div>
       <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />

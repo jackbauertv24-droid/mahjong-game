@@ -23,7 +23,7 @@ export function DiscardTile({ tile, size = 'small' }: DiscardTileProps) {
         opacity-85
       `}
     >
-      <div className="text-lg sm:text-xl md:text-2xl">
+      <div className="text-3xl sm:text-4xl md:text-5xl">
         {tile.emoji}
       </div>
       <div className="absolute inset-0 rounded-md bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
