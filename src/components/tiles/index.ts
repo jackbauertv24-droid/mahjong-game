@@ -1,0 +1,1 @@
+export { TileComponent as Tile, TileBack, WallTile } from './Tile'

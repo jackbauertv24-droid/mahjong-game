@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Segoe UI', 'Microsoft YaHei', '微软雅黑', sans-serif;
+    background: linear-gradient(to bottom, #1a472a, #0a2a1a);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  #root {
+    width: 100%;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .rotate-x-10 {
+    transform: rotateX(10deg);
+  }
+  
+  .tile-shadow {
+    box-shadow: 
+      2px 2px 4px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  }
+  
+  .tile-container {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+}
+
+@layer utilities {
+  .animate-draw {
+    animation: draw 0.5s ease-out;
+  }
+  
+  .animate-discard {
+    animation: discard 0.3s ease-in;
+  }
+  
+  .animate-lift {
+    animation: lift 0.2s ease-out;
+  }
+}
+
+@keyframes draw {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes discard {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0.7;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes lift {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-8px);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}

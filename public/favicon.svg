@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect x="4" y="4" width="56" height="56" rx="8" fill="#f5f5dc" stroke="#8b7355" stroke-width="2"/>
+  <text x="32" y="40" text-anchor="middle" font-size="28" font-weight="bold" font-family="serif" fill="#c41e3a">一</text>
+  <text x="32" y="54" text-anchor="middle" font-size="12" font-family="serif" fill="#8b7355">万</text>
+</svg>
