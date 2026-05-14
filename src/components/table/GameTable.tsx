@@ -5,7 +5,7 @@ import { ActionBar, TurnIndicator, Header } from '../ui'
 import { useGameStore } from '../../game/flow'
 
 export function GameTable() {
-  const { wall, hands, currentTurn, initGame } = useGameStore()
+  const { wall, hands, initGame } = useGameStore()
   
   const showGame = wall.length > 0 || hands.east.tiles.length > 0
   
