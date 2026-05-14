@@ -7,15 +7,19 @@ interface DiscardTileProps {
 
 export function DiscardTile({ tile, size = 'small' }: DiscardTileProps) {
   const sizeClasses = {
-    small: 'w-10 h-12 sm:w-11 sm:h-13',
-    mini: 'w-7 h-9 sm:w-8 sm:h-10',
+    small: 'w-10 h-14 sm:w-12 h-16',
+    mini: 'w-8 h-10',
   }
+  
+  const emojiSize = size === 'small'
+    ? 'text-4xl sm:text-5xl'
+    : 'text-3xl'
   
   return (
     <div
       className={`
         ${sizeClasses[size]}
-        relative flex flex-col items-center justify-center
+        relative flex flex-col items-center justify-center overflow-hidden
         rounded-md
         bg-gradient-to-b from-[#f5f5dc] to-[#e8e8c8]
         border border-[#8b7355]/50
@@ -24,7 +28,7 @@ export function DiscardTile({ tile, size = 'small' }: DiscardTileProps) {
       `}
     >
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-6xl sm:text-7xl leading-none" style={{ lineHeight: '1' }}>
+        <span className={`${emojiSize} leading-none`} style={{ lineHeight: '1' }}>
           {tile.emoji}
         </span>
       </div>

@@ -10,8 +10,12 @@ interface TileProps {
 
 export function TileComponent({ tile, onClick, isSelected, disabled, size = 'normal' }: TileProps) {
   const baseClasses = size === 'normal' 
-    ? 'w-12 h-16 sm:w-14 sm:h-18 md:w-16 md:h-20'
-    : 'w-8 h-10 sm:w-10 sm:h-12'
+    ? 'w-14 h-20 sm:w-16 h-24 md:w-20 h-28'
+    : 'w-10 h-14 sm:w-12 h-16'
+  
+  const emojiSize = size === 'normal'
+    ? 'text-5xl sm:text-6xl md:text-7xl'
+    : 'text-3xl sm:text-4xl'
   
   return (
     <div
@@ -19,7 +23,7 @@ export function TileComponent({ tile, onClick, isSelected, disabled, size = 'nor
       className={`
         ${baseClasses}
         relative flex flex-col items-center justify-center
-        rounded-lg cursor-pointer select-none
+        rounded-lg cursor-pointer select-none overflow-hidden
         transition-all duration-200 ease-out
         bg-gradient-to-b from-[#f5f5dc] to-[#e8e8c8]
         border-2 border-[#8b7355]
@@ -35,7 +39,7 @@ export function TileComponent({ tile, onClick, isSelected, disabled, size = 'nor
       }}
     >
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-7xl sm:text-8xl md:text-9xl leading-none transform scale-90 sm:scale-100" style={{ lineHeight: '1' }}>
+        <span className={`${emojiSize} leading-none`} style={{ lineHeight: '1' }}>
           {tile.emoji}
         </span>
       </div>
@@ -51,9 +55,9 @@ interface TileBackProps {
 
 export function TileBack({ size = 'normal', className = '' }: TileBackProps) {
   const sizeClasses = {
-    normal: 'w-12 h-16 sm:w-14 sm:h-18 md:w-16 md:h-20',
-    small: 'w-8 h-10 sm:w-10 sm:h-12',
-    mini: 'w-6 h-8 sm:w-7 sm:h-9',
+    normal: 'w-14 h-20 sm:w-16 h-24 md:w-20 h-28',
+    small: 'w-10 h-14 sm:w-12 h-16',
+    mini: 'w-8 h-10',
   }
   
   return (
@@ -62,7 +66,7 @@ export function TileBack({ size = 'normal', className = '' }: TileBackProps) {
         ${sizeClasses[size]}
         ${className}
         relative flex items-center justify-center
-        rounded-lg
+        rounded-lg overflow-hidden
         bg-gradient-to-b from-[#2d5a3d] to-[#1a472a]
         border-2 border-[#0a2a1a]
         shadow-tile
