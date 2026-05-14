@@ -13,10 +13,6 @@ export function TileComponent({ tile, onClick, isSelected, disabled, size = 'nor
     ? 'w-14 h-20 sm:w-16 h-24 md:w-20 h-28'
     : 'w-10 h-14 sm:w-12 h-16'
   
-  const emojiSize = size === 'normal'
-    ? 'text-7xl sm:text-8xl md:text-9xl'
-    : 'text-5xl sm:text-6xl'
-  
   return (
     <div
       onClick={disabled ? undefined : onClick}
@@ -38,11 +34,11 @@ export function TileComponent({ tile, onClick, isSelected, disabled, size = 'nor
         transform: isSelected ? 'translateY(-8px) rotateX(10deg)' : undefined,
       }}
     >
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className={`${emojiSize} leading-none scale-110`} style={{ lineHeight: '1' }}>
-          {tile.emoji}
-        </span>
-      </div>
+      <img 
+        src={tile.imagePath}
+        alt={tile.displayName}
+        className="w-full h-full object-contain p-1"
+      />
       <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
     </div>
   )

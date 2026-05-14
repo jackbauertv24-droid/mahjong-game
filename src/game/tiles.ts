@@ -8,6 +8,7 @@ export interface Tile {
   value: TileValue
   emoji: string
   displayName: string
+  imagePath: string
 }
 
 export interface TileGroup {
@@ -41,6 +42,14 @@ const SUIT_DISPLAY: Record<TileSuit, string> = {
   ji: '季',
 }
 
+export function getTileImagePath(suit: TileSuit, value: TileValue): string {
+  if (suit === 'hua' || suit === 'ji') {
+    return ''
+  }
+  const valueNum = typeof value === 'number' ? value : parseInt(value as string) || 0
+  return `/mahjong-game/assets/tiles/${suit}/${valueNum}.svg`
+}
+
 export function createTile(suit: TileSuit, value: TileValue, emoji: string, index: number): Tile {
   const valueNum = typeof value === 'number' ? value : parseInt(value as string) || 0
   const displayName = suit === 'feng' || suit === 'jian' || suit === 'hua' || suit === 'ji'
@@ -53,6 +62,7 @@ export function createTile(suit: TileSuit, value: TileValue, emoji: string, inde
     value,
     emoji,
     displayName,
+    imagePath: getTileImagePath(suit, value),
   }
 }
 

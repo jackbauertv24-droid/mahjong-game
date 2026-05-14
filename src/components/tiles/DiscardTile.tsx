@@ -11,10 +11,6 @@ export function DiscardTile({ tile, size = 'small' }: DiscardTileProps) {
     mini: 'w-8 h-10',
   }
   
-  const emojiSize = size === 'small'
-    ? 'text-6xl sm:text-7xl'
-    : 'text-4xl'
-  
   return (
     <div
       className={`
@@ -27,11 +23,11 @@ export function DiscardTile({ tile, size = 'small' }: DiscardTileProps) {
         opacity-85
       `}
     >
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className={`${emojiSize} leading-none scale-110`} style={{ lineHeight: '1' }}>
-          {tile.emoji}
-        </span>
-      </div>
+      <img 
+        src={tile.imagePath}
+        alt={tile.displayName}
+        className="w-full h-full object-contain p-0.5"
+      />
       <div className="absolute inset-0 rounded-md bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
     </div>
   )
