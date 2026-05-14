@@ -12,8 +12,8 @@ export function DiscardTile({ tile, size = 'small' }: DiscardTileProps) {
   }
   
   const emojiSize = size === 'small'
-    ? 'text-4xl sm:text-5xl'
-    : 'text-3xl'
+    ? 'text-6xl sm:text-7xl'
+    : 'text-4xl'
   
   return (
     <div
@@ -28,7 +28,7 @@ export function DiscardTile({ tile, size = 'small' }: DiscardTileProps) {
       `}
     >
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className={`${emojiSize} leading-none`} style={{ lineHeight: '1' }}>
+        <span className={`${emojiSize} leading-none scale-110`} style={{ lineHeight: '1' }}>
           {tile.emoji}
         </span>
       </div>

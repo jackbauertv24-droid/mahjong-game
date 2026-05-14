@@ -14,8 +14,8 @@ export function TileComponent({ tile, onClick, isSelected, disabled, size = 'nor
     : 'w-10 h-14 sm:w-12 h-16'
   
   const emojiSize = size === 'normal'
-    ? 'text-5xl sm:text-6xl md:text-7xl'
-    : 'text-3xl sm:text-4xl'
+    ? 'text-7xl sm:text-8xl md:text-9xl'
+    : 'text-5xl sm:text-6xl'
   
   return (
     <div
@@ -39,7 +39,7 @@ export function TileComponent({ tile, onClick, isSelected, disabled, size = 'nor
       }}
     >
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className={`${emojiSize} leading-none`} style={{ lineHeight: '1' }}>
+        <span className={`${emojiSize} leading-none scale-110`} style={{ lineHeight: '1' }}>
           {tile.emoji}
         </span>
       </div>
