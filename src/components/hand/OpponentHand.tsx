@@ -11,13 +11,15 @@ export function OpponentHand({ position }: OpponentHandProps) {
   const playerHand = hands[position]
   const isActive = currentTurn === position
   
-  const layoutClasses = {
+  const layoutClasses: Record<PlayerPosition, string> = {
+    east: 'flex-row gap-0.5 sm:gap-1',
     south: 'flex-row gap-0.5 sm:gap-1',
     west: 'flex-col gap-0.5 sm:gap-1',
     north: 'flex-row gap-0.5 sm:gap-1',
   }
   
-  const containerClasses = {
+  const containerClasses: Record<PlayerPosition, string> = {
+    east: '',
     south: 'absolute right-4 sm:right-8 top-1/4 flex flex-col items-end',
     west: 'absolute left-4 sm:left-8 top-1/3 flex flex-col items-start',
     north: 'absolute left-4 sm:left-8 top-1/4 flex flex-col items-start',

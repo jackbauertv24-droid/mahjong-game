@@ -1,6 +1,4 @@
-import { Tile } from '../game/tiles'
-import { useGameStore } from '../game/flow'
-import { getTileColorByCharacter } from '../game/tiles'
+import { Tile, getTileColorByCharacter } from '../../game/tiles'
 
 interface TileProps {
   tile: Tile

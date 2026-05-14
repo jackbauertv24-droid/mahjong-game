@@ -19,7 +19,7 @@ export function PlayerHand() {
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="flex flex-wrap justify-center gap-1 sm:gap-2 max-w-xl px-4">
-        {sortedTiles.map((tile, index) => (
+        {sortedTiles.map((tile) => (
           <Tile
             key={tile.id}
             tile={tile}
