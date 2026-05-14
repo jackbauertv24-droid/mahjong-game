@@ -1,4 +1,4 @@
-import { Tile, getTileColorByCharacter } from '../../game/tiles'
+import { Tile } from '../../game/tiles'
 
 interface TileProps {
   tile: Tile
@@ -9,7 +9,6 @@ interface TileProps {
 }
 
 export function TileComponent({ tile, onClick, isSelected, disabled, size = 'normal' }: TileProps) {
-  const color = getTileColorByCharacter(tile.character)
   const baseClasses = size === 'normal' 
     ? 'w-12 h-16 sm:w-14 sm:h-18 md:w-16 md:h-20'
     : 'w-8 h-10 sm:w-10 sm:h-12'
@@ -35,17 +34,9 @@ export function TileComponent({ tile, onClick, isSelected, disabled, size = 'nor
         transform: isSelected ? 'translateY(-8px) rotateX(10deg)' : undefined,
       }}
     >
-      <div
-        className="text-2xl sm:text-3xl font-bold font-serif"
-        style={{ color }}
-      >
-        {tile.character}
+      <div className="text-2xl sm:text-3xl md:text-4xl">
+        {tile.emoji}
       </div>
-      {tile.suit !== 'feng' && tile.suit !== 'jian' && tile.suit !== 'hua' && tile.suit !== 'ji' && (
-        <div className="text-xs sm:text-sm text-gray-600 absolute bottom-1">
-          {tile.suit === 'wan' ? '万' : tile.suit === 'tong' ? '筒' : '条'}
-        </div>
-      )}
       <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
     </div>
   )
