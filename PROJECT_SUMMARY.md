@@ -219,6 +219,119 @@ Total: 30 files, 1146+ lines
 
 ---
 
+## Layout Fixes (Phase 1 Post-Deployment)
+
+### Issues Found
+
+After initial deployment, user identified several layout problems:
+
+1. **Wrong seating order** - Players positioned incorrectly relative to East
+2. **Wrong tile orientation** - All opponents showed horizontal tiles
+3. **Simplified discard display** - Discards lacked suit indicator (unreadable)
+4. **Draw button placement** - Centered at top (hard to reach)
+
+### Correct Seating (Clockwise E→S→W→N)
+
+From East (you) perspective:
+
+| Player | Direction | Position | Tile Orientation | Discard Layout |
+|--------|-----------|----------|------------------|----------------|
+| **South** | Downstream (next) | LEFT side | Vertical ↓ | Vertical in front |
+| **West** | Opposite | TOP center | Horizontal → | Horizontal below |
+| **North** | Upstream (previous) | RIGHT side | Vertical ↓ | Vertical in front |
+
+### Fixes Implemented
+
+| File | Change |
+|------|--------|
+| `OpponentHand.tsx` | Corrected positions (south→left, west→top, north→right) and orientations |
+| `DiscardTile.tsx` | New component - full tile display with character + suit |
+| `FloatingActionButton.tsx` | New FAB with Chinese character 抽, fixed bottom-right |
+| `Wall.tsx` | Made more subtle (smaller, 40% opacity) |
+| `DiscardArea.tsx` | Uses DiscardTile, shows last 6 discards |
+| `ActionBar.tsx` | Removed Draw button (moved to FAB) |
+| `GameTable.tsx` | Corrected opponent placement order |
+
+### Visual Changes
+
+```
+Before (Wrong):
+              NORTH (left)    SOUTH (right)
+              [horizontal]    [horizontal]
+              WEST (left)
+              [vertical]
+
+After (Correct):
+              WEST (top - opposite)
+              [horizontal tiles]
+              [horizontal discards below]
+
+SOUTH (left - downstream)    NORTH (right - upstream)
+[vertical tiles ↓]            [vertical tiles ↓]
+[vertical discards]           [vertical discards]
+
+              [Your discards - horizontal]
+              [Your hand - interactive]
+                              [FAB: 抽] (bottom-right)
+```
+
+### Component Structure (Updated)
+
+```
+src/components/
+├── tiles/
+│   ├── Tile.tsx            # Interactive tiles for hand
+│   ├── TileBack.tsx        # Back-facing tiles (exported from Tile.tsx)
+│   ├── DiscardTile.tsx     # NEW: Full tile display for discards
+│   └── index.ts
+├── hand/
+│   ├── PlayerHand.tsx      # Your interactive hand
+│   ├── OpponentHand.tsx    # FIXED: Positions + orientations
+│   └── index.ts
+├── table/
+│   ├── GameTable.tsx       # FIXED: Opponent placement order
+│   ├── Wall.tsx            # UPDATED: More subtle
+│   ├── DiscardArea.tsx     # UPDATED: DiscardTile, last 6
+│   └── index.ts
+├── ui/
+│   ├── Header.tsx
+│   ├── TurnIndicator.tsx
+│   ├── ActionBar.tsx       # UPDATED: Removed Draw button
+│   ├── FloatingActionButton.tsx  # NEW: FAB with 抽
+│   └── index.ts
+```
+
+---
+
+## Verification Summary (Latest)
+
+### curl Tests
+
+```bash
+# HTML page - 200 OK
+curl https://jackbauertv24-droid.github.io/mahjong-game/
+
+# JS bundle - 200 OK, contains 抽
+curl https://jackbauertv24-droid.github.io/mahjong-game/assets/index-qeHjskjo.js
+
+# CSS bundle - 200 OK
+curl https://jackbauertv24-droid.github.io/mahjong-game/assets/index-B_C6NLeQ.css
+```
+
+### Deployments History
+
+| Run ID | Status | Description |
+|--------|--------|-------------|
+| 25838939736 | ✅ Success | Layout fixes (seating, FAB, discards) |
+| 25838171635 | ✅ Success | Fixed Start Game button |
+| 25837963056 | ✅ Success | Added summary doc |
+| 25837370103 | ✅ Success | Pages enabled manually |
+| 25837307197 | ❌ Failed | Pages not enabled |
+| 25837037151 | ❌ Failed | TypeScript errors |
+| 25836977111 | ❌ Failed | npm ci error |
+
+---
+
 ## Conclusion
 
 Successfully built and deployed a Chinese Classical Mahjong demo game with:
