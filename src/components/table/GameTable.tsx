@@ -5,9 +5,9 @@ import { ActionBar, TurnIndicator, Header } from '../ui'
 import { useGameStore } from '../../game/flow'
 
 export function GameTable() {
-  const { wall, currentTurn, initGame } = useGameStore()
+  const { wall, hands, currentTurn, initGame } = useGameStore()
   
-  const showGame = wall.length > 0 || currentTurn === 'east'
+  const showGame = wall.length > 0 || hands.east.tiles.length > 0
   
   return (
     <div className="relative w-full min-h-[80vh] sm:min-h-[85vh] flex flex-col items-center justify-center">
