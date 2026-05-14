@@ -34,8 +34,10 @@ export function TileComponent({ tile, onClick, isSelected, disabled, size = 'nor
         transform: isSelected ? 'translateY(-8px) rotateX(10deg)' : undefined,
       }}
     >
-      <div className="text-4xl sm:text-5xl md:text-6xl">
-        {tile.emoji}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-7xl sm:text-8xl md:text-9xl leading-none transform scale-90 sm:scale-100" style={{ lineHeight: '1' }}>
+          {tile.emoji}
+        </span>
       </div>
       <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
     </div>

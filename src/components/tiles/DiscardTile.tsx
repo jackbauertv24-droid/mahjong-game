@@ -23,8 +23,10 @@ export function DiscardTile({ tile, size = 'small' }: DiscardTileProps) {
         opacity-85
       `}
     >
-      <div className="text-3xl sm:text-4xl md:text-5xl">
-        {tile.emoji}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-6xl sm:text-7xl leading-none" style={{ lineHeight: '1' }}>
+          {tile.emoji}
+        </span>
       </div>
       <div className="absolute inset-0 rounded-md bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
     </div>
