@@ -52,7 +52,7 @@ export function OpponentHand({ position }: OpponentHandProps) {
   
   if (position === 'south') {
     return (
-      <div className={`${containerClasses[position]} flex-row-reverse gap-3`}>
+      <div className={`${containerClasses[position]} flex-row gap-3`}>
         <div className="flex flex-col items-start gap-1">
           <div className={`flex ${layoutClasses[position]}`}>
             {playerHand.tiles.slice(0, 13).map((_, idx) => (
