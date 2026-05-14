@@ -1,7 +1,7 @@
 import { Wall } from './Wall'
 import { DiscardArea } from './DiscardArea'
 import { PlayerHand, OpponentHand } from '../hand'
-import { ActionBar, TurnIndicator, Header } from '../ui'
+import { ActionBar, TurnIndicator, Header, FloatingActionButton } from '../ui'
 import { useGameStore } from '../../game/flow'
 
 export function GameTable() {
@@ -29,9 +29,9 @@ export function GameTable() {
           <ActionBar />
           
           <div className="relative w-full max-w-4xl aspect-[4/3] sm:aspect-[5/4] flex items-center justify-center my-4">
-            <OpponentHand position="north" />
-            <OpponentHand position="west" />
             <OpponentHand position="south" />
+            <OpponentHand position="west" />
+            <OpponentHand position="north" />
             
             <div className="absolute inset-0 flex items-center justify-center">
               <Wall tilesRemaining={wall.length} />
@@ -45,6 +45,8 @@ export function GameTable() {
           <div className="mt-4">
             <PlayerHand />
           </div>
+          
+          <FloatingActionButton />
         </>
       )}
     </div>
