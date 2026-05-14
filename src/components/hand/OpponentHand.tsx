@@ -36,9 +36,9 @@ export function OpponentHand({ position }: OpponentHandProps) {
               <TileBack key={idx} size="small" className="opacity-80" />
             ))}
           </div>
-          <div className="text-xs sm:text-sm text-white/80">
+          <div className="relative text-xs sm:text-sm text-white/80">
             西 WEST
-            {isActive && <span className="ml-1 text-yellow-400 animate-pulse">●</span>}
+            <span className={`absolute -right-3 top-1/2 -translate-y-1/2 text-yellow-400 animate-pulse ${isActive ? 'opacity-100' : 'opacity-0'}`}>●</span>
           </div>
           <div className={`flex ${layoutClasses[position]} gap-0.5 mt-1`}>
             {discards.map(tile => (
@@ -59,9 +59,9 @@ export function OpponentHand({ position }: OpponentHandProps) {
               <TileBack key={idx} size="small" className="opacity-80" />
             ))}
           </div>
-          <div className="text-xs sm:text-sm text-white/80">
+          <div className="relative text-xs sm:text-sm text-white/80">
             南 SOUTH
-            {isActive && <span className="ml-1 text-yellow-400 animate-pulse">●</span>}
+            <span className={`absolute -right-3 top-1/2 -translate-y-1/2 text-yellow-400 animate-pulse ${isActive ? 'opacity-100' : 'opacity-0'}`}>●</span>
           </div>
         </div>
         <div className={`flex ${layoutClasses[position]} gap-0.5`}>
@@ -87,9 +87,9 @@ export function OpponentHand({ position }: OpponentHandProps) {
               <TileBack key={idx} size="small" className="opacity-80" />
             ))}
           </div>
-          <div className="text-xs sm:text-sm text-white/80">
+          <div className="relative text-xs sm:text-sm text-white/80">
             北 NORTH
-            {isActive && <span className="ml-1 text-yellow-400 animate-pulse">●</span>}
+            <span className={`absolute -right-3 top-1/2 -translate-y-1/2 text-yellow-400 animate-pulse ${isActive ? 'opacity-100' : 'opacity-0'}`}>●</span>
           </div>
         </div>
       </div>
