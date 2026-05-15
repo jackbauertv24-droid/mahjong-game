@@ -194,7 +194,7 @@ export function GameTable3D() {
                 <directionalLight position={[0, 15, -5]} intensity={1.5} castShadow shadow-mapSize={[2048,2048]} />
                 <Table />
                 <Wall count={wall.length} />
-                <EastHand tiles={hands.east.tiles} onDiscard={isPlayerTurn ? (id) => discardTile('east', id) : undefined} />
+                <EastHand tiles={hands.east.tiles} onDiscard={isPlayerTurn ? (id) => discardTile('east', id) : () => {}} />
                 <SouthHand count={hands.south.tiles.length} />
                 <WestHand count={hands.west.tiles.length} />
                 <NorthHand count={hands.north.tiles.length} />
