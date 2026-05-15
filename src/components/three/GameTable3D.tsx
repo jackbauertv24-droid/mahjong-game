@@ -1,6 +1,6 @@
-import { Suspense, useState } from 'react'
-import { Canvas, useLoader, ThreeEvent } from '@react-three/fiber'
-import { RoundedBox } from '@react-three/drei'
+import { Suspense, useState, useRef } from 'react'
+import { Canvas, useLoader, ThreeEvent, useThree } from '@react-three/fiber'
+import { RoundedBox, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { useGameStore } from '../../game/flow'
 import { Header, TurnIndicator, ActionBar, FloatingActionButton } from '../ui'
@@ -16,12 +16,10 @@ function TileFace({ imagePath }: { imagePath: string }) {
   
   return (
     <>
-      {/* WHITE BACKGROUND PLANE */}
       <mesh position={[0, 0, TILE_D / 2 + 0.01]}>
         <planeGeometry args={[TILE_W * 0.92, TILE_H * 0.92]} />
         <meshBasicMaterial color="#ffffff" />
       </mesh>
-      {/* SVG TEXTURE ON TOP */}
       <mesh position={[0, 0, TILE_D / 2 + 0.02]}>
         <planeGeometry args={[TILE_W * 0.85, TILE_H * 0.85]} />
         <meshBasicMaterial map={texture} transparent={true} />
@@ -67,12 +65,10 @@ function Tile({ position, rotation, tile, isBack, onClick }: {
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
     >
-      {/* TILE BODY */}
       <RoundedBox args={[TILE_W, TILE_H, TILE_D]} radius={0.04} smoothness={4} castShadow receiveShadow>
         <meshStandardMaterial color={isBack ? "#2d5a3d" : "#fffef5"} />
       </RoundedBox>
       
-      {/* BACK: Green circle pattern */}
       {isBack && (
         <mesh position={[0, 0, TILE_D/2 + 0.01]}>
           <circleGeometry args={[0.08, 32]} />
@@ -80,7 +76,6 @@ function Tile({ position, rotation, tile, isBack, onClick }: {
         </mesh>
       )}
       
-      {/* FACE: White background + SVG texture */}
       {!isBack && tile && (
         <Suspense fallback={
           <mesh position={[0, 0, TILE_D / 2 + 0.01]}>
@@ -186,6 +181,22 @@ function Discards({ tiles }: { tiles: Array<{ id: string; suit: string; imagePat
   </>
 }
 
+function CameraController() {
+  const controlsRef = useRef<any>(null)
+  
+  return (
+    <OrbitControls 
+      ref={controlsRef}
+      enableRotate={false}
+      enablePan={false}
+      enableZoom={true}
+      minDistance={5}
+      maxDistance={25}
+      target={[0, 0, 0]}
+    />
+  )
+}
+
 export function GameTable3D() {
   const { wall, hands, currentTurn, initGame, discardTile } = useGameStore()
   const showGame = wall.length > 0 || hands.east.tiles.length > 0
@@ -214,6 +225,7 @@ export function GameTable3D() {
                 <WestHand count={hands.west.tiles.length} />
                 <NorthHand count={hands.north.tiles.length} />
                 <Discards tiles={hands.east.discards} />
+                <CameraController />
               </Suspense>
             </Canvas>
           </div>
