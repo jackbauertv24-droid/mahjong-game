@@ -1,5 +1,5 @@
 import { Suspense, useState, useRef } from 'react'
-import { Canvas, useLoader, ThreeEvent, useThree } from '@react-three/fiber'
+import { Canvas, useLoader, ThreeEvent } from '@react-three/fiber'
 import { RoundedBox, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { useGameStore } from '../../game/flow'
