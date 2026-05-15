@@ -8,7 +8,7 @@ interface PlayerHand3DProps {
 }
 
 export function PlayerHand3D({ tiles }: PlayerHand3DProps) {
-  const { currentTurn, discardTile, drawnTile } = useGameStore()
+  const { currentTurn, discardTile } = useGameStore()
   const [selectedTileId, setSelectedTileId] = useState<string | null>(null)
   
   const isPlayerTurn = currentTurn === 'east'
@@ -29,11 +29,10 @@ export function PlayerHand3D({ tiles }: PlayerHand3DProps) {
   return (
     <group position={[0, 0, -3]}>
       {tiles.map((tile, i) => {
-        const x = startX + i * tileSpacing
-        const isSelected = selectedTileId === tile.id
-        const isDrawnTile = drawnTile?.id === tile.id
-        
-        return (
+const x = startX + i * tileSpacing
+      const isSelected = selectedTileId === tile.id
+      
+      return (
           <Tile3D
             key={tile.id}
             tile={tile}

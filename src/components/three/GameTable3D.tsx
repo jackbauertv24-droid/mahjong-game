@@ -54,7 +54,7 @@ export function GameTable3D() {
               
               <TableSurface />
               <Wall3D tilesRemaining={wall.length} />
-              <DiscardArea discards={hands.east.discards} />
+              <DiscardArea3D discards={hands.east.discards} />
               <PlayerHand3D tiles={hands.east.tiles} />
               <OpponentHand3D position="south" tiles={hands.south.tiles} />
               <OpponentHand3D position="west" tiles={hands.west.tiles} />

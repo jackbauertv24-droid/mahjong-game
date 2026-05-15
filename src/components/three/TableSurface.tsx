@@ -1,5 +1,3 @@
-import { RoundedBox } from '@react-three/drei'
-
 export function TableSurface() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
