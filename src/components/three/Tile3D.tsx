@@ -1,9 +1,8 @@
 import { useRef, useState } from 'react'
-import { RoundedBox, useTexture } from '@react-three/drei'
+import { RoundedBox } from '@react-three/drei'
 import { useFrame, ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import { Tile } from '../../game/tiles'
-import { Suspense } from 'react'
 
 interface Tile3DProps {
   tile: Tile
@@ -14,25 +13,12 @@ interface Tile3DProps {
   isHoverable?: boolean
 }
 
-function TileFace({ tile }: { tile: Tile }) {
-  const texture = useTexture(tile.imagePath)
-  texture.colorSpace = THREE.SRGBColorSpace
-  
-  return (
-    <mesh position={[0, 0, 0.2]}>
-      <planeGeometry args={[0.6, 0.9]} />
-      <meshBasicMaterial map={texture} transparent />
-    </mesh>
-  )
-}
-
-function TileBackFace() {
-  return (
-    <mesh position={[0, 0, -0.2]} rotation={[0, Math.PI, 0]}>
-      <planeGeometry args={[0.6, 0.9]} />
-      <meshBasicMaterial color="#2d5a3d" />
-    </mesh>
-  )
+const TILE_COLORS: Record<string, string> = {
+  wan: '#d4a574',
+  tiao: '#8b4513',
+  tong: '#cd853f',
+  feng: '#6b8e23',
+  jian: '#2e8b57',
 }
 
 export function Tile3D({ 
@@ -48,6 +34,7 @@ export function Tile3D({
   
   const targetY = isSelected ? position[1] + 0.3 : position[1]
   const targetScale = hovered && isHoverable ? 1.1 : 1
+  const tileColor = TILE_COLORS[tile.suit] || '#f5f5dc'
   
   useFrame(() => {
     if (!meshRef.current) return
@@ -92,14 +79,18 @@ export function Tile3D({
       onPointerOut={handlePointerOut}
     >
       <RoundedBox args={[0.7, 1.0, 0.4]} radius={0.05} smoothness={4} castShadow receiveShadow>
-        <meshStandardMaterial color="#f5f5dc" />
+        <meshStandardMaterial color={tileColor} />
       </RoundedBox>
       
-      <Suspense fallback={null}>
-        <TileFace tile={tile} />
-      </Suspense>
+      <mesh position={[0, 0, 0.21]}>
+        <planeGeometry args={[0.5, 0.7]} />
+        <meshBasicMaterial color="#ffffff" />
+      </mesh>
       
-      <TileBackFace />
+      <mesh position={[0, 0, -0.2]} rotation={[0, Math.PI, 0]}>
+        <planeGeometry args={[0.5, 0.7]} />
+        <meshBasicMaterial color="#2d5a3d" />
+      </mesh>
     </group>
   )
 }
@@ -117,7 +108,7 @@ export function TileBack3D({
         <meshStandardMaterial color="#2d5a3d" />
       </RoundedBox>
       
-      <mesh position={[0, 0, 0.2]}>
+      <mesh position={[0, 0, 0.21]}>
         <circleGeometry args={[0.15, 32]} />
         <meshBasicMaterial color="#3a6a4d" />
       </mesh>
