@@ -137,7 +137,7 @@ function Discards({ tiles }: { tiles: Array<{ id: string; suit: string; imagePat
 }
 
 export function GameTable3D() {
-  const { wall, hands, currentTurn, initGame, discardTile } = useGameStore()
+  const { wall, hands, initGame } = useGameStore()
   const showGame = wall.length > 0 || hands.east.tiles.length > 0
   
   return (
