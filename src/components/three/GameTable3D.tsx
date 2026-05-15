@@ -1,133 +1,144 @@
-import { Suspense, useMemo } from 'react'
+import { Suspense } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
 import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import { useGameStore } from '../../game/flow'
 import { Header, TurnIndicator, ActionBar, FloatingActionButton } from '../ui'
 
-const TILE_WIDTH = 0.6
-const TILE_HEIGHT = 0.85
-const TILE_DEPTH = 0.3
-
-interface Tile3DProps {
-  tile: { id: string; suit: string; value: number | string; imagePath: string }
-  position: [number, number, number]
-  rotation?: [number, number, number]
-  onClick?: () => void
-}
+const TILE_W = 0.55
+const TILE_H = 0.8
+const TILE_D = 0.25
+const TABLE_RADIUS = 4.5
 
 function TileFace({ imagePath }: { imagePath: string }) {
   const texture = useLoader(THREE.TextureLoader, imagePath)
   texture.colorSpace = THREE.SRGBColorSpace
   return (
-    <mesh position={[0, 0, TILE_DEPTH / 2 + 0.005]}>
-      <planeGeometry args={[TILE_WIDTH * 0.85, TILE_HEIGHT * 0.85]} />
+    <mesh position={[0, 0, TILE_D / 2 + 0.005]}>
+      <planeGeometry args={[TILE_W * 0.85, TILE_H * 0.85]} />
       <meshBasicMaterial map={texture} />
     </mesh>
   )
 }
 
-function Tile3D({ tile, position, rotation = [0, 0, 0], onClick }: Tile3DProps) {
-  return (
-    <group position={position} rotation={rotation} onClick={onClick}>
-      <RoundedBox args={[TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH]} radius={0.05} smoothness={4} castShadow receiveShadow>
-        <meshStandardMaterial color="#fffef5" />
-      </RoundedBox>
-      <Suspense fallback={<mesh position={[0, 0, TILE_DEPTH/2+0.005]}><planeGeometry args={[TILE_WIDTH*0.7, TILE_HEIGHT*0.7]} /><meshBasicMaterial color="#fffef5" /></mesh>}>
-        <TileFace imagePath={tile.imagePath} />
-      </Suspense>
-    </group>
-  )
-}
-
-function TileBack3D({ position, rotation = [0, 0, 0] }: { position: [number, number, number]; rotation?: [number, number, number] }) {
+function Tile({ position, rotation, tile, showFace }: {
+  position: [number, number, number]
+  rotation: [number, number, number]
+  tile?: { id: string; suit: string; imagePath: string }
+  showFace: boolean
+}) {
   return (
     <group position={position} rotation={rotation}>
-      <RoundedBox args={[TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH]} radius={0.05} smoothness={4} castShadow receiveShadow>
-        <meshStandardMaterial color="#2d5a3d" />
+      <RoundedBox args={[TILE_W, TILE_H, TILE_D]} radius={0.04} smoothness={4} castShadow receiveShadow>
+        <meshStandardMaterial color={showFace ? "#fffef5" : "#2d5a3d"} />
       </RoundedBox>
+      {showFace && tile && (
+        <Suspense fallback={<mesh position={[0, 0, TILE_D/2+0.005]}><planeGeometry args={[TILE_W*0.8, TILE_H*0.8]} /><meshBasicMaterial color="#fffef5" /></mesh>}>
+          <TileFace imagePath={tile.imagePath} />
+        </Suspense>
+      )}
+      {!showFace && (
+        <mesh position={[0, 0, TILE_D/2+0.005]}>
+          <circleGeometry args={[0.1, 32]} />
+          <meshBasicMaterial color="#3a6a4d" />
+        </mesh>
+      )}
     </group>
   )
 }
 
-function TableSurface() {
+function Table() {
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
-      <planeGeometry args={[12, 12]} />
+    <mesh rotation={[-Math.PI/2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
+      <planeGeometry args={[10, 10]} />
       <meshStandardMaterial color="#1a472a" />
     </mesh>
   )
 }
 
 function Wall({ count }: { count: number }) {
-  const positions = useMemo(() => {
-    const result: [number, number, number][] = []
-    const perRow = 12
-    for (let i = 0; i < Math.min(count, 24); i++) {
-      const row = Math.floor(i / perRow)
-      const col = i % perRow
-      const x = (col - perRow / 2 + 0.5) * (TILE_WIDTH + 0.05)
-      const y = TILE_HEIGHT / 2 + row * (TILE_DEPTH + 0.05)
-      const z = 5.5 + row * 0.5
-      result.push([x, y, z])
+  const tiles = []
+  for (let i = 0; i < Math.min(count, 20); i++) {
+    const row = Math.floor(i / 10)
+    const col = i % 10
+    const x = (col - 5 + 0.5) * (TILE_W + 0.04)
+    const y = TILE_H/2 + row * (TILE_D + 0.04)
+    const z = TABLE_RADIUS + 0.5 + row * 0.3
+    tiles.push({ pos: [x, y, z] as [number,number,number], rot: [0, 0, 0] as [number,number,number] })
+  }
+  return <>{tiles.map((t, i) => <Tile key={i} position={t.pos} rotation={t.rot} showFace={false} />)}</>
+}
+
+function PlayerRow({ tiles, side }: { tiles: Array<{ id: string; suit: string; imagePath: string }>; side: 'east' | 'south' | 'west' | 'north' }) {
+  const positions: { pos: [number,number,number]; rot: [number,number,number] }[] = []
+  const spacing = TILE_W + 0.06
+  
+  for (let i = 0; i < tiles.length; i++) {
+    const offset = (i - (tiles.length - 1) / 2) * spacing
+    
+    if (side === 'east') {
+      positions.push({ pos: [offset, TILE_H/2, -TABLE_RADIUS], rot: [0, Math.PI, 0] })
+    } else if (side === 'south') {
+      positions.push({ pos: [-TABLE_RADIUS, TILE_H/2, offset], rot: [0, -Math.PI/2, 0] })
+    } else if (side === 'west') {
+      positions.push({ pos: [offset, TILE_H/2, TABLE_RADIUS], rot: [0, 0, 0] })
+    } else if (side === 'north') {
+      positions.push({ pos: [TABLE_RADIUS, TILE_H/2, offset], rot: [0, Math.PI/2, 0] })
     }
-    return result
-  }, [count])
-  return <>{positions.map((pos, i) => <TileBack3D key={i} position={pos} />)}</>
-}
-
-function PlayerHand({ tiles, onDiscard }: { tiles: Array<{ id: string; suit: string; value: number | string; imagePath: string }>; onDiscard?: (id: string) => void }) {
-  const spacing = TILE_WIDTH + 0.1
-  const startX = -(tiles.length - 1) * spacing / 2
-  return (
-    <group position={[0, 0, -5]}>
-      {tiles.map((tile, i) => (
-        <Tile3D key={tile.id} tile={tile} position={[startX + i * spacing, TILE_HEIGHT/2, 0]} onClick={() => onDiscard?.(tile.id)} />
-      ))}
-    </group>
-  )
-}
-
-function OpponentHand({ position, count }: { position: 'south' | 'west' | 'north'; count: number }) {
-  const configs: Record<string, { pos: [number, number, number]; rot: [number, number, number] }> = {
-    south: { pos: [-5.5, 0, 0], rot: [0, Math.PI/2, 0] },
-    west: { pos: [0, 0, 5.5], rot: [0, Math.PI, 0] },
-    north: { pos: [5.5, 0, 0], rot: [0, -Math.PI/2, 0] },
   }
-  const { pos, rot } = configs[position]
-  const spacing = TILE_WIDTH + 0.08
-  const positions: [number, number, number][] = []
-  for (let i = 0; i < Math.min(count, 13); i++) {
-    const offset = (i - (Math.min(count,13)-1)/2) * spacing
-    positions.push([offset, TILE_HEIGHT/2, 0])
-  }
-  return (
-    <group position={pos} rotation={rot}>
-      {positions.map((p, i) => <TileBack3D key={i} position={p} />)}
-    </group>
-  )
+  
+  const isEast = side === 'east'
+  
+  return <>
+    {positions.map((p, i) => (
+      <Tile key={tiles[i].id} position={p.pos} rotation={p.rot} tile={tiles[i]} showFace={isEast} />
+    ))}
+  </>
 }
 
-function DiscardArea({ discards }: { discards: Array<{ id: string; suit: string; value: number | string; imagePath: string }> }) {
-  const spacing = TILE_WIDTH + 0.05
-  const perRow = 7
-  return (
-    <group position={[0, 0, -0.5]}>
-      {discards.slice(-10).map((tile, i) => {
-        const row = Math.floor(i / perRow)
-        const col = i % perRow
-        const visibleCount = Math.min(discards.slice(-10).length, perRow)
-        const pos: [number, number, number] = [(col - visibleCount/2 + 0.5) * spacing, TILE_HEIGHT/2, row * (TILE_HEIGHT + 0.05)]
-        return <Tile3D key={tile.id} tile={tile} position={pos} />
-      })}
-    </group>
-  )
+function OpponentRow({ count, side }: { count: number; side: 'south' | 'west' | 'north' }) {
+  const positions: { pos: [number,number,number]; rot: [number,number,number] }[] = []
+  const spacing = TILE_W + 0.06
+  
+  for (let i = 0; i < count; i++) {
+    const offset = (i - (count - 1) / 2) * spacing
+    
+    if (side === 'south') {
+      positions.push({ pos: [-TABLE_RADIUS, TILE_H/2, offset], rot: [0, -Math.PI/2, 0] })
+    } else if (side === 'west') {
+      positions.push({ pos: [offset, TILE_H/2, TABLE_RADIUS], rot: [0, 0, 0] })
+    } else if (side === 'north') {
+      positions.push({ pos: [TABLE_RADIUS, TILE_H/2, offset], rot: [0, Math.PI/2, 0] })
+    }
+  }
+  
+  return <>
+    {positions.map((p, i) => <Tile key={i} position={p.pos} rotation={p.rot} showFace={false} />)}
+  </>
+}
+
+function Discards({ tiles }: { tiles: Array<{ id: string; suit: string; imagePath: string }> }) {
+  const positions: { pos: [number,number,number]; rot: [number,number,number] }[] = []
+  const spacing = TILE_W + 0.04
+  const perRow = 6
+  
+  for (let i = 0; i < Math.min(tiles.length, 12); i++) {
+    const row = Math.floor(i / perRow)
+    const col = i % perRow
+    const offset = (col - Math.min(Math.min(tiles.length,12), perRow)/2 + 0.5) * spacing
+    positions.push({ pos: [offset, TILE_H/2, -TABLE_RADIUS + 1 + row * (TILE_H + 0.04)], rot: [0, Math.PI, 0] })
+  }
+  
+  return <>
+    {tiles.slice(-12).map((tile, i) => (
+      <Tile key={tile.id} position={positions[i]?.pos || [0, TILE_H/2, -2]} rotation={positions[i]?.rot || [0, Math.PI, 0]} tile={tile} showFace={true} />
+    ))}
+  </>
 }
 
 export function GameTable3D() {
   const { wall, hands, currentTurn, initGame, discardTile } = useGameStore()
   const showGame = wall.length > 0 || hands.east.tiles.length > 0
-  const isPlayerTurn = currentTurn === 'east'
   
   return (
     <div className="w-full min-h-screen flex flex-col items-center p-2 sm:p-4">
@@ -140,18 +151,18 @@ export function GameTable3D() {
         <>
           <TurnIndicator />
           <ActionBar />
-          <div className="w-full max-w-5xl h-[60vh] sm:h-[70vh] rounded-lg overflow-hidden shadow-2xl">
-            <Canvas camera={{ position: [0, 10, -10], fov: 45 }} shadows gl={{ antialias: true }}>
+          <div className="w-full max-w-5xl h-[65vh] sm:h-[75vh] rounded-lg overflow-hidden shadow-2xl">
+            <Canvas camera={{ position: [0, 12, -12], fov: 35 }} shadows gl={{ antialias: true }}>
               <Suspense fallback={null}>
-                <ambientLight intensity={0.9} />
-                <directionalLight position={[5, 15, -5]} intensity={1.2} castShadow shadow-mapSize={[1024,1024]} />
-                <TableSurface />
+                <ambientLight intensity={0.7} />
+                <directionalLight position={[3, 10, -5]} intensity={1} castShadow shadow-mapSize={[1024,1024]} />
+                <Table />
                 <Wall count={wall.length} />
-                <PlayerHand tiles={hands.east.tiles} onDiscard={isPlayerTurn ? (id) => discardTile('east', id) : undefined} />
-                <OpponentHand position="south" count={hands.south.tiles.length} />
-                <OpponentHand position="west" count={hands.west.tiles.length} />
-                <OpponentHand position="north" count={hands.north.tiles.length} />
-                <DiscardArea discards={hands.east.discards} />
+                <PlayerRow tiles={hands.east.tiles} side="east" />
+                <OpponentRow count={hands.south.tiles.length} side="south" />
+                <OpponentRow count={hands.west.tiles.length} side="west" />
+                <OpponentRow count={hands.north.tiles.length} side="north" />
+                <Discards tiles={hands.east.discards} />
               </Suspense>
             </Canvas>
           </div>
