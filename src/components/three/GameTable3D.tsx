@@ -148,10 +148,10 @@ function PlayerHand({ tiles, onDiscard }: { tiles: Array<{ id: string; suit: str
 }
 
 function OpponentHand({ position, count }: { position: 'left' | 'top' | 'right'; count: number }) {
-  const configs = {
-    left: { groupPos: [-5.5, 0, 0], groupRot: [0, Math.PI / 2, 0], tileOffset: 'x' },
-    top: { groupPos: [0, 0, 5.5], groupRot: [0, Math.PI, 0], tileOffset: 'z' },
-    right: { groupPos: [5.5, 0, 0], groupRot: [0, -Math.PI / 2, 0], tileOffset: 'x' },
+  const configs: Record<string, { groupPos: [number, number, number]; groupRot: [number, number, number] }> = {
+    left: { groupPos: [-5.5, 0, 0], groupRot: [0, Math.PI / 2, 0] },
+    top: { groupPos: [0, 0, 5.5], groupRot: [0, Math.PI, 0] },
+    right: { groupPos: [5.5, 0, 0], groupRot: [0, -Math.PI / 2, 0] },
   }
   
   const config = configs[position]
