@@ -315,13 +315,96 @@ Loop continues until wall empty → Game Over
 
 Successfully built and deployed a dual-version Chinese Classical Mahjong demo:
 - **2D Version**: Stable, using SVG tiles, CSS 3D effects
-- **3D Version**: Beta, using Three.js/R3F, currently debugging
+- **3D Version**: Working, using Three.js/R3F with proper square table layout
 - **Version Switch**: Simple StartScreen with two buttons
 - **Safe Architecture**: 2D components untouched, 3D isolated in separate directory
 
-**Current Status**: 3D version shows blank - investigating Canvas rendering issues. Simplified to colored boxes for debugging.
+---
 
-**Next steps**: 
-1. Debug 3D Canvas rendering
-2. Add SVG texture loading for 3D tiles
-3. Implement Peng/Chi/Gang actions
+## 3D Implementation Final Details
+
+### Square Table Formation
+
+4 players sit around a square table, each with tiles in ONE perpendicular row:
+
+| Position | Location | Row Direction | Tile Rotation |
+|----------|----------|---------------|---------------|
+| East (you) | z=-3.8 (bottom) | Along x-axis (horizontal) | 180° (faces toward you) |
+| South | x=-3.8 (left) | Along z-axis (vertical) | -90° (faces toward South) |
+| West | z=3.8 (top) | Along x-axis (horizontal) | 0° (faces toward West) |
+| North | x=3.8 (right) | Along z-axis (vertical) | 90° (faces toward North) |
+
+### Camera Position
+
+- **Position**: `[0, 14, -10]` - behind East player, elevated
+- **FOV**: 30 - narrow field of view for clear perspective
+- **Orientation**: Looking toward table center
+
+### Tile Properties
+
+| Property | Value |
+|----------|-------|
+| Width | 0.5 units |
+| Height | 0.7 units |
+| Depth | 0.2 units |
+| Face Color | #fffef5 (cream/white) |
+| Back Color | #2d5a3d (green) |
+| Radius | 0.04 (rounded edges) |
+
+### Interactions
+
+- **Click to Discard**: Click any tile in your hand to discard
+- **Hover Effect**: Tiles scale to 1.15 when hovered
+- **Cursor**: Pointer cursor on hoverable tiles
+
+### Key Learnings (3D)
+
+1. **Canvas Height**: Must be explicit pixels, aspect ratio alone doesn't work
+2. **Suspense Placement**: Wrap entire scene, not individual components  
+3. **Tile Orientation**: Each player sees their own faces, opponents see backs
+4. **Square Formation**: Rows must be perpendicular (along different axes)
+5. **Texture Loading**: Use `toneMapped={false}` for accurate SVG colors
+6. **Camera FOV**: 30-35 works best for table view (too wide distorts perspective)
+
+---
+
+## GitHub Actions Runs (3D Development)
+
+| Run ID | Status | Description |
+|--------|--------|-------------|
+| 25904488336 | ✅ Success | Final: white tiles, discard click, square layout |
+| 25904406593 | ❌ Failed | TypeScript: onDiscard type |
+| 25904171289 | ✅ Success | Remove unused variables |
+| 25904102570 | ❌ Failed | TypeScript: unused imports |
+| 25903343659 | ✅ Success | Camera behind East |
+| 25902437891 | ✅ Success | Layout attempt (wrong camera) |
+| 25901595376 | ✅ Success | TypeScript fixes |
+| 25901338995 | ✅ Success | Basic 3D scene (overlap issues) |
+| 25899244544 | ✅ Success | Debug: orange box confirmed Canvas works |
+| 25899014173 | ✅ Success | Canvas height, Suspense |
+| 25896145728 | ❌ Failed | Initial 3D (TypeScript errors) |
+
+---
+
+## Files Modified/Created for 3D
+
+**New Files:**
+- `src/screens/StartScreen.tsx` - Version selector
+- `src/screens/index.ts`
+- `src/components/three/GameTable3D.tsx` - Main 3D scene
+- `src/components/three/index.ts`
+
+**Modified Files:**
+- `package.json` - Added three, @react-three/fiber, @react-three/drei
+- `src/App.tsx` - Added version state
+
+**Unchanged Files:**
+- All 2D components remain untouched
+
+---
+
+## Next Steps
+
+1. Add Peng/Chi/Gang actions
+2. Win detection
+3. Scoring system
