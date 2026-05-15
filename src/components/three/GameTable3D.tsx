@@ -223,11 +223,14 @@ function CameraController() {
     <OrbitControls 
       ref={controlsRef}
       enableRotate={false}
-      enablePan={false}
+      enablePan={true}
       enableZoom={true}
       minDistance={8}
       maxDistance={30}
       target={[0, 0, 0]}
+      panSpeed={0.5}
+      maxAzimuthAngle={Infinity}
+      minAzimuthAngle={Infinity}
     />
   )
 }
