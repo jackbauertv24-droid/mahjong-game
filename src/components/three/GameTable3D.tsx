@@ -1,20 +1,20 @@
-import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrthographicCamera } from '@react-three/drei'
-import { TableSurface } from './TableSurface'
-import { Wall3D } from './Wall'
-import { DiscardArea3D } from './DiscardArea'
-import { PlayerHand3D } from './PlayerHand'
-import { OpponentHand3D } from './OpponentHand'
 import { useGameStore } from '../../game/flow'
 import { Header, TurnIndicator, ActionBar, FloatingActionButton } from '../ui'
 
-function LoadingFallback() {
+function SimpleScene() {
   return (
-    <mesh position={[0, 0, 0]}>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="#4a7a5d" />
-    </mesh>
+    <>
+      <ambientLight intensity={1} />
+      <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[2, 2, 2]} />
+        <meshStandardMaterial color="orange" />
+      </mesh>
+      <mesh position={[0, -0.5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[10, 10]} />
+        <meshStandardMaterial color="#1a472a" />
+      </mesh>
+    </>
   )
 }
 
@@ -40,37 +40,9 @@ export function GameTable3D() {
           <TurnIndicator />
           <ActionBar />
           
-          <div className="relative w-full max-w-4xl h-[500px] sm:h-[600px]">
-            <Canvas
-              shadows
-              gl={{ antialias: true }}
-              camera={{ position: [12, 12, 12], zoom: 40 }}
-            >
-              <Suspense fallback={<LoadingFallback />}>
-                <OrthographicCamera
-                  makeDefault
-                  position={[12, 12, 12]}
-                  zoom={40}
-                  near={0.1}
-                  far={1000}
-                />
-                
-                <ambientLight intensity={0.6} />
-                <directionalLight
-                  position={[10, 20, 10]}
-                  intensity={1}
-                  castShadow
-                  shadow-mapSize={[1024, 1024]}
-                />
-                
-                <TableSurface />
-                <Wall3D tilesRemaining={wall.length} />
-                <DiscardArea3D discards={hands.east.discards} />
-                <PlayerHand3D tiles={hands.east.tiles} />
-                <OpponentHand3D position="south" tiles={hands.south.tiles} />
-                <OpponentHand3D position="west" tiles={hands.west.tiles} />
-                <OpponentHand3D position="north" tiles={hands.north.tiles} />
-              </Suspense>
+          <div className="w-full h-[600px] border-4 border-red-500">
+            <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
+              <SimpleScene />
             </Canvas>
           </div>
           
