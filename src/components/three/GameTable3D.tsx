@@ -5,17 +5,9 @@ import * as THREE from 'three'
 import { useGameStore } from '../../game/flow'
 import { Header, TurnIndicator, ActionBar, FloatingActionButton } from '../ui'
 
-const TILE_WIDTH = 0.8
-const TILE_HEIGHT = 1.2
-const TILE_DEPTH = 0.5
-
-const SUIT_COLORS: Record<string, string> = {
-  wan: '#f5deb3',
-  tiao: '#deb887',
-  tong: '#d2b48c',
-  feng: '#8fbc8f',
-  jian: '#556b2f',
-}
+const TILE_WIDTH = 0.65
+const TILE_HEIGHT = 0.9
+const TILE_DEPTH = 0.35
 
 interface Tile3DProps {
   tile: {
@@ -35,39 +27,37 @@ function TileFace({ imagePath }: { imagePath: string }) {
   
   return (
     <mesh position={[0, 0, TILE_DEPTH / 2 + 0.01]}>
-      <planeGeometry args={[TILE_WIDTH * 0.85, TILE_HEIGHT * 0.85]} />
+      <planeGeometry args={[TILE_WIDTH * 0.9, TILE_HEIGHT * 0.9]} />
       <meshBasicMaterial map={texture} transparent={false} />
     </mesh>
   )
 }
 
 function Tile3D({ tile, position, rotation = [0, 0, 0], onClick }: Tile3DProps) {
-  const baseColor = SUIT_COLORS[tile.suit] || '#f5deb3'
-  
   return (
     <group position={position} rotation={rotation} onClick={onClick}>
       <RoundedBox 
         args={[TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH]} 
-        radius={0.08} 
+        radius={0.06} 
         smoothness={4}
         castShadow
         receiveShadow
       >
-        <meshStandardMaterial color={baseColor} />
+        <meshStandardMaterial color="#f5f0e6" />
       </RoundedBox>
       
       <Suspense fallback={
         <mesh position={[0, 0, TILE_DEPTH / 2 + 0.01]}>
-          <planeGeometry args={[TILE_WIDTH * 0.7, TILE_HEIGHT * 0.7]} />
-          <meshBasicMaterial color="#ffffff" />
+          <planeGeometry args={[TILE_WIDTH * 0.75, TILE_HEIGHT * 0.75]} />
+          <meshBasicMaterial color="#f5f0e6" />
         </mesh>
       }>
         <TileFace imagePath={tile.imagePath} />
       </Suspense>
       
       <mesh position={[0, 0, -TILE_DEPTH / 2 - 0.01]} rotation={[0, Math.PI, 0]}>
-        <planeGeometry args={[TILE_WIDTH * 0.6, TILE_HEIGHT * 0.6]} />
-        <meshBasicMaterial color="#1a472a" />
+        <planeGeometry args={[TILE_WIDTH * 0.5, TILE_HEIGHT * 0.5]} />
+        <meshBasicMaterial color="#2d5a3d" />
       </mesh>
     </group>
   )
@@ -78,17 +68,17 @@ function TileBack3D({ position, rotation = [0, 0, 0] }: { position: [number, num
     <group position={position} rotation={rotation}>
       <RoundedBox 
         args={[TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH]} 
-        radius={0.08} 
+        radius={0.06} 
         smoothness={4}
         castShadow
         receiveShadow
       >
-        <meshStandardMaterial color="#1a472a" />
+        <meshStandardMaterial color="#2d5a3d" />
       </RoundedBox>
       
       <mesh position={[0, 0, TILE_DEPTH / 2 + 0.01]}>
-        <circleGeometry args={[0.18, 32]} />
-        <meshBasicMaterial color="#2d5a3d" />
+        <circleGeometry args={[0.12, 32]} />
+        <meshBasicMaterial color="#3a6a4d" />
       </mesh>
     </group>
   )
@@ -97,7 +87,7 @@ function TileBack3D({ position, rotation = [0, 0, 0] }: { position: [number, num
 function TableSurface() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-      <planeGeometry args={[14, 14]} />
+      <planeGeometry args={[18, 18]} />
       <meshStandardMaterial color="#1a472a" />
     </mesh>
   )
@@ -106,15 +96,15 @@ function TableSurface() {
 function Wall({ count }: { count: number }) {
   const tiles = useMemo(() => {
     const result = []
-    const perRow = 9
-    const maxVisible = Math.min(count, 18)
+    const perRow = 10
+    const maxVisible = Math.min(count, 20)
     
     for (let i = 0; i < maxVisible; i++) {
       const row = Math.floor(i / perRow)
       const col = i % perRow
-      const x = (col - perRow / 2 + 0.5) * (TILE_WIDTH + 0.1)
-      const y = row * (TILE_DEPTH + 0.1) + TILE_HEIGHT / 2
-      const z = 3.5
+      const x = (col - perRow / 2 + 0.5) * (TILE_WIDTH + 0.08)
+      const y = row * (TILE_DEPTH + 0.05) + TILE_HEIGHT / 2
+      const z = 5
       result.push([x, y, z] as [number, number, number])
     }
     return result
@@ -130,16 +120,16 @@ function Wall({ count }: { count: number }) {
 }
 
 function PlayerHand({ tiles, onDiscard }: { tiles: Array<{ id: string; suit: string; value: number | string; imagePath: string }>; onDiscard?: (id: string) => void }) {
-  const spacing = TILE_WIDTH + 0.15
+  const spacing = TILE_WIDTH + 0.12
   const startX = -(tiles.length - 1) * spacing / 2
   
   return (
-    <group position={[0, 0, -5]}>
+    <group position={[0, 0, -6.5]}>
       {tiles.map((tile, i) => (
         <Tile3D
           key={tile.id}
           tile={tile}
-          position={[startX + i * spacing, TILE_HEIGHT / 2 + 0.1, 0]}
+          position={[startX + i * spacing, TILE_HEIGHT / 2 + 0.05, 0]}
           onClick={() => onDiscard?.(tile.id)}
         />
       ))}
@@ -147,24 +137,20 @@ function PlayerHand({ tiles, onDiscard }: { tiles: Array<{ id: string; suit: str
   )
 }
 
-function OpponentHand({ position, count }: { position: 'left' | 'top' | 'right'; count: number }) {
+function OpponentHand({ position, count }: { position: 'south' | 'west' | 'north'; count: number }) {
   const configs: Record<string, { groupPos: [number, number, number]; groupRot: [number, number, number] }> = {
-    left: { groupPos: [-5.5, 0, 0], groupRot: [0, Math.PI / 2, 0] },
-    top: { groupPos: [0, 0, 5.5], groupRot: [0, Math.PI, 0] },
-    right: { groupPos: [5.5, 0, 0], groupRot: [0, -Math.PI / 2, 0] },
+    south: { groupPos: [-8, 0, 0], groupRot: [0, Math.PI / 2, 0] },
+    west: { groupPos: [0, 0, 8], groupRot: [0, Math.PI, 0] },
+    north: { groupPos: [8, 0, 0], groupRot: [0, -Math.PI / 2, 0] },
   }
   
   const config = configs[position]
-  const spacing = TILE_WIDTH + 0.15
+  const spacing = TILE_WIDTH + 0.1
   const positions: [number, number, number][] = []
   
   for (let i = 0; i < Math.min(count, 13); i++) {
     const offset = (i - (Math.min(count, 13) - 1) / 2) * spacing
-    if (position === 'top') {
-      positions.push([offset, TILE_HEIGHT / 2 + 0.1, 0])
-    } else {
-      positions.push([offset, TILE_HEIGHT / 2 + 0.1, 0])
-    }
+    positions.push([offset, TILE_HEIGHT / 2 + 0.05, 0])
   }
   
   return (
@@ -177,25 +163,24 @@ function OpponentHand({ position, count }: { position: 'left' | 'top' | 'right';
 }
 
 function DiscardArea({ discards }: { discards: Array<{ id: string; suit: string; value: number | string; imagePath: string }> }) {
-  const spacing = TILE_WIDTH + 0.1
+  const spacing = TILE_WIDTH + 0.08
   const perRow = 8
-  const positions = useMemo(() => {
-    return discards.slice(-12).map((_, i) => {
-      const row = Math.floor(i / perRow)
-      const col = i % perRow
-      return [
-        (col - Math.min(perRow, discards.slice(-12).length) / 2 + 0.5) * spacing,
-        TILE_HEIGHT / 2,
-        row * (TILE_HEIGHT + 0.1) + 1.5
-      ] as [number, number, number]
-    })
-  }, [discards])
   
   return (
-    <group position={[0, 0, 0]}>
-      {discards.slice(-12).map((tile, i) => (
-        <Tile3D key={tile.id} tile={tile} position={positions[i]} />
-      ))}
+    <group position={[0, 0, -1]}>
+      {discards.slice(-12).map((tile, i) => {
+        const row = Math.floor(i / perRow)
+        const col = i % perRow
+        const visibleCount = Math.min(discards.slice(-12).length, perRow)
+        const pos: [number, number, number] = [
+          (col - visibleCount / 2 + 0.5) * spacing,
+          TILE_HEIGHT / 2,
+          row * (TILE_HEIGHT + 0.1)
+        ]
+        return (
+          <Tile3D key={tile.id} tile={tile} position={pos} />
+        )
+      })}
     </group>
   )
 }
@@ -203,19 +188,19 @@ function DiscardArea({ discards }: { discards: Array<{ id: string; suit: string;
 function Lights() {
   return (
     <>
-      <ambientLight intensity={0.4} />
+      <ambientLight intensity={0.8} />
       <directionalLight 
-        position={[10, 20, 5]} 
-        intensity={1.2} 
+        position={[0, 25, 10]} 
+        intensity={1.5} 
         castShadow
         shadow-mapSize={[2048, 2048]}
-        shadow-camera-far={50}
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10}
+        shadow-camera-far={60}
+        shadow-camera-left={-15}
+        shadow-camera-right={15}
+        shadow-camera-top={15}
+        shadow-camera-bottom={-15}
       />
-      <directionalLight position={[-5, 10, -5]} intensity={0.3} />
+      <directionalLight position={[0, 15, -10]} intensity={0.5} />
     </>
   )
 }
@@ -251,25 +236,25 @@ export function GameTable3D() {
           <TurnIndicator />
           <ActionBar />
           
-          <div className="w-full max-w-5xl h-[60vh] sm:h-[70vh] rounded-lg overflow-hidden shadow-2xl">
+          <div className="w-full max-w-6xl h-[65vh] sm:h-[75vh] rounded-lg overflow-hidden shadow-2xl border-4 border-[#1a472a]/50">
             <Canvas
               camera={{ 
-                position: [0, 12, 10], 
-                fov: 45,
+                position: [0, 18, 14], 
+                fov: 40,
                 near: 0.1,
                 far: 100
               }}
               shadows
-              gl={{ antialias: true, preserveDrawingBuffer: true }}
+              gl={{ antialias: true }}
             >
               <Suspense fallback={null}>
                 <Lights />
                 <TableSurface />
                 <Wall count={wall.length} />
                 <PlayerHand tiles={hands.east.tiles} onDiscard={handleDiscard} />
-                <OpponentHand position="left" count={hands.south.tiles.length} />
-                <OpponentHand position="top" count={hands.west.tiles.length} />
-                <OpponentHand position="right" count={hands.north.tiles.length} />
+                <OpponentHand position="south" count={hands.south.tiles.length} />
+                <OpponentHand position="west" count={hands.west.tiles.length} />
+                <OpponentHand position="north" count={hands.north.tiles.length} />
                 <DiscardArea discards={hands.east.discards} />
               </Suspense>
             </Canvas>
