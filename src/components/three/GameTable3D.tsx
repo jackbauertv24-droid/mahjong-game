@@ -99,34 +99,6 @@ function Table() {
   )
 }
 
-function Wall({ count }: { count: number }) {
-  const tiles = []
-  const perSide = Math.ceil(count / 4)
-  
-  for (let i = 0; i < Math.min(count, 40); i++) {
-    const side = Math.floor(i / perSide)
-    const posInSide = i % perSide
-    const spacing = TILE_W + 0.03
-    
-    if (side === 0) {
-      const x = (posInSide - perSide/2 + 0.5) * spacing
-      tiles.push({ pos: [x, TILE_H/2, TABLE_RADIUS + 0.3], rot: [0, 0, 0] })
-    } else if (side === 1) {
-      const z = (posInSide - perSide/2 + 0.5) * spacing
-      tiles.push({ pos: [TABLE_RADIUS + 0.3, TILE_H/2, z], rot: [0, Math.PI/2, 0] })
-    } else if (side === 2) {
-      const x = (posInSide - perSide/2 + 0.5) * spacing
-      tiles.push({ pos: [x, TILE_H/2, -TABLE_RADIUS - 0.3], rot: [0, Math.PI, 0] })
-    } else if (side === 3) {
-      const z = (posInSide - perSide/2 + 0.5) * spacing
-      tiles.push({ pos: [-TABLE_RADIUS - 0.3, TILE_H/2, z], rot: [0, -Math.PI/2, 0] })
-    }
-  }
-  return <>
-    {tiles.map((t, i) => <Tile key={i} position={t.pos as [number,number,number]} rotation={t.rot as [number,number,number]} isBack={true} />)}
-  </>
-}
-
 function EastHand({ tiles, onDiscard }: { tiles: Array<{ id: string; suit: string; imagePath: string }>; onDiscard: (id: string) => void }) {
   const spacing = TILE_W + 0.05
   
@@ -181,61 +153,65 @@ function NorthHand({ count }: { count: number }) {
 }
 
 function EastDiscards({ tiles }: { tiles: Array<{ id: string; suit: string; imagePath: string }> }) {
-  const spacing = TILE_W + 0.04
-  const perRow = 6
+  const spacing = TILE_W + 0.03
+  const perRow = 8
   
   return <>
     {tiles.map((tile, i) => {
       const row = Math.floor(i / perRow)
       const col = i % perRow
-      const x = (col - Math.min(tiles.length % perRow || perRow, perRow)/2 + 0.5) * spacing
+      const rowTileCount = Math.min(tiles.length - row * perRow, perRow)
+      const x = (col - rowTileCount/2 + 0.5) * spacing
       const z = -TABLE_RADIUS + 1.5 + row * (TILE_H + 0.05)
-      return <Tile key={tile.id} position={[x, TILE_H/2, z]} rotation={[0, Math.PI, 0]} tile={tile} isBack={false} />
+      return <Tile key={tile.id} position={[x, TILE_D/2 + 0.01, z]} rotation={[-Math.PI/2, 0, 0]} tile={tile} isBack={false} />
     })}
   </>
 }
 
 function SouthDiscards({ tiles }: { tiles: Array<{ id: string; suit: string; imagePath: string }> }) {
-  const spacing = TILE_W + 0.04
-  const perRow = 6
+  const spacing = TILE_W + 0.03
+  const perRow = 8
   
   return <>
     {tiles.map((tile, i) => {
       const row = Math.floor(i / perRow)
       const col = i % perRow
-      const z = (col - Math.min(tiles.length % perRow || perRow, perRow)/2 + 0.5) * spacing
+      const rowTileCount = Math.min(tiles.length - row * perRow, perRow)
+      const z = (col - rowTileCount/2 + 0.5) * spacing
       const x = -TABLE_RADIUS + 1.5 + row * (TILE_H + 0.05)
-      return <Tile key={tile.id} position={[x, TILE_H/2, z]} rotation={[0, -Math.PI/2, 0]} tile={tile} isBack={false} />
+      return <Tile key={tile.id} position={[x, TILE_D/2 + 0.01, z]} rotation={[-Math.PI/2, 0, Math.PI/2]} tile={tile} isBack={false} />
     })}
   </>
 }
 
 function WestDiscards({ tiles }: { tiles: Array<{ id: string; suit: string; imagePath: string }> }) {
-  const spacing = TILE_W + 0.04
-  const perRow = 6
+  const spacing = TILE_W + 0.03
+  const perRow = 8
   
   return <>
     {tiles.map((tile, i) => {
       const row = Math.floor(i / perRow)
       const col = i % perRow
-      const x = (col - Math.min(tiles.length % perRow || perRow, perRow)/2 + 0.5) * spacing
+      const rowTileCount = Math.min(tiles.length - row * perRow, perRow)
+      const x = (col - rowTileCount/2 + 0.5) * spacing
       const z = TABLE_RADIUS - 1.5 - row * (TILE_H + 0.05)
-      return <Tile key={tile.id} position={[x, TILE_H/2, z]} rotation={[0, 0, 0]} tile={tile} isBack={false} />
+      return <Tile key={tile.id} position={[x, TILE_D/2 + 0.01, z]} rotation={[-Math.PI/2, 0, Math.PI]} tile={tile} isBack={false} />
     })}
   </>
 }
 
 function NorthDiscards({ tiles }: { tiles: Array<{ id: string; suit: string; imagePath: string }> }) {
-  const spacing = TILE_W + 0.04
-  const perRow = 6
+  const spacing = TILE_W + 0.03
+  const perRow = 8
   
   return <>
     {tiles.map((tile, i) => {
       const row = Math.floor(i / perRow)
       const col = i % perRow
-      const z = (col - Math.min(tiles.length % perRow || perRow, perRow)/2 + 0.5) * spacing
+      const rowTileCount = Math.min(tiles.length - row * perRow, perRow)
+      const z = (col - rowTileCount/2 + 0.5) * spacing
       const x = TABLE_RADIUS - 1.5 - row * (TILE_H + 0.05)
-      return <Tile key={tile.id} position={[x, TILE_H/2, z]} rotation={[0, Math.PI/2, 0]} tile={tile} isBack={false} />
+      return <Tile key={tile.id} position={[x, TILE_D/2 + 0.01, z]} rotation={[-Math.PI/2, 0, -Math.PI/2]} tile={tile} isBack={false} />
     })}
   </>
 }
@@ -249,8 +225,8 @@ function CameraController() {
       enableRotate={false}
       enablePan={false}
       enableZoom={true}
-      minDistance={5}
-      maxDistance={25}
+      minDistance={8}
+      maxDistance={30}
       target={[0, 0, 0]}
     />
   )
@@ -273,12 +249,11 @@ export function GameTable3D() {
           <TurnIndicator />
           <ActionBar />
           <div className="w-full max-w-5xl h-[70vh] rounded-lg overflow-hidden shadow-2xl">
-            <Canvas camera={{ position: [0, 14, -10], fov: 30 }} shadows gl={{ antialias: true }}>
+            <Canvas camera={{ position: [0, 20, -12], fov: 28 }} shadows gl={{ antialias: true }}>
               <Suspense fallback={null}>
-                <ambientLight intensity={0.6} />
-                <directionalLight position={[0, 15, -5]} intensity={1.5} castShadow shadow-mapSize={[2048,2048]} />
+                <ambientLight intensity={0.7} />
+                <directionalLight position={[0, 20, -5]} intensity={1.2} castShadow shadow-mapSize={[2048,2048]} />
                 <Table />
-                <Wall count={wall.length} />
                 <EastHand tiles={hands.east.tiles} onDiscard={isPlayerTurn ? (id) => discardTile('east', id) : () => {}} />
                 <SouthHand count={hands.south.tiles.length} />
                 <WestHand count={hands.west.tiles.length} />
