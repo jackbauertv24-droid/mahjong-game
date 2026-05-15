@@ -13,19 +13,28 @@ const TABLE_RADIUS = 3.8
 function TileFace({ imagePath }: { imagePath: string }) {
   const texture = useLoader(THREE.TextureLoader, imagePath)
   texture.colorSpace = THREE.SRGBColorSpace
+  
   return (
-    <mesh position={[0, 0, TILE_D / 2 + 0.01]}>
-      <planeGeometry args={[TILE_W * 0.9, TILE_H * 0.9]} />
-      <meshBasicMaterial map={texture} toneMapped={false} />
-    </mesh>
+    <>
+      {/* WHITE BACKGROUND PLANE */}
+      <mesh position={[0, 0, TILE_D / 2 + 0.01]}>
+        <planeGeometry args={[TILE_W * 0.92, TILE_H * 0.92]} />
+        <meshBasicMaterial color="#ffffff" />
+      </mesh>
+      {/* SVG TEXTURE ON TOP */}
+      <mesh position={[0, 0, TILE_D / 2 + 0.02]}>
+        <planeGeometry args={[TILE_W * 0.85, TILE_H * 0.85]} />
+        <meshBasicMaterial map={texture} transparent={true} />
+      </mesh>
+    </>
   )
 }
 
-function Tile({ position, rotation, tile, showFace, onClick }: {
+function Tile({ position, rotation, tile, isBack, onClick }: {
   position: [number, number, number]
   rotation: [number, number, number]
   tile?: { id: string; suit: string; imagePath: string }
-  showFace: boolean
+  isBack: boolean
   onClick?: () => void
 }) {
   const [hovered, setHovered] = useState(false)
@@ -58,21 +67,29 @@ function Tile({ position, rotation, tile, showFace, onClick }: {
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
     >
+      {/* TILE BODY */}
       <RoundedBox args={[TILE_W, TILE_H, TILE_D]} radius={0.04} smoothness={4} castShadow receiveShadow>
-        <meshStandardMaterial color={showFace ? "#fffef5" : "#2d5a3d"} />
+        <meshStandardMaterial color={isBack ? "#2d5a3d" : "#fffef5"} />
       </RoundedBox>
       
-      {showFace && tile && (
-        <Suspense fallback={null}>
-          <TileFace imagePath={tile.imagePath} />
-        </Suspense>
-      )}
-      
-      {!showFace && (
-        <mesh position={[0, 0, TILE_D/2+0.01]}>
+      {/* BACK: Green circle pattern */}
+      {isBack && (
+        <mesh position={[0, 0, TILE_D/2 + 0.01]}>
           <circleGeometry args={[0.08, 32]} />
           <meshBasicMaterial color="#3a6a4d" />
         </mesh>
+      )}
+      
+      {/* FACE: White background + SVG texture */}
+      {!isBack && tile && (
+        <Suspense fallback={
+          <mesh position={[0, 0, TILE_D / 2 + 0.01]}>
+            <planeGeometry args={[TILE_W * 0.92, TILE_H * 0.92]} />
+            <meshBasicMaterial color="#ffffff" />
+          </mesh>
+        }>
+          <TileFace imagePath={tile.imagePath} />
+        </Suspense>
       )}
     </group>
   )
@@ -97,61 +114,59 @@ function Wall({ count }: { count: number }) {
     const z = TABLE_RADIUS + 0.8 + row * 0.2
     tiles.push({ pos: [x, y, z] as [number,number,number], rot: [0, 0, 0] as [number,number,number] })
   }
-  return <>{tiles.map((t, i) => <Tile key={i} position={t.pos} rotation={t.rot} showFace={false} />)}</>
+  return <>{tiles.map((t, i) => <Tile key={i} position={t.pos} rotation={t.rot} isBack={true} />)}</>
 }
 
 function EastHand({ tiles, onDiscard }: { tiles: Array<{ id: string; suit: string; imagePath: string }>; onDiscard: (id: string) => void }) {
-  const positions: { pos: [number,number,number]; rot: [number,number,number] }[] = []
   const spacing = TILE_W + 0.05
   
-  for (let i = 0; i < tiles.length; i++) {
-    const x = (i - (tiles.length - 1) / 2) * spacing
-    positions.push({ pos: [x, TILE_H/2, -TABLE_RADIUS], rot: [0, Math.PI, 0] })
-  }
-  
   return <>
-    {positions.map((p, i) => (
-      <Tile key={tiles[i].id} position={p.pos} rotation={p.rot} tile={tiles[i]} showFace={true} onClick={() => onDiscard(tiles[i].id)} />
-    ))}
+    {tiles.map((tile, i) => {
+      const x = (i - (tiles.length - 1) / 2) * spacing
+      return (
+        <Tile 
+          key={tile.id} 
+          position={[x, TILE_H/2, -TABLE_RADIUS]} 
+          rotation={[0, Math.PI, 0]} 
+          tile={tile} 
+          isBack={false}
+          onClick={() => onDiscard(tile.id)} 
+        />
+      )
+    })}
   </>
 }
 
 function SouthHand({ count }: { count: number }) {
-  const positions: { pos: [number,number,number]; rot: [number,number,number] }[] = []
   const spacing = TILE_W + 0.05
   
-  for (let i = 0; i < count; i++) {
-    const z = (i - (count - 1) / 2) * spacing
-    positions.push({ pos: [-TABLE_RADIUS, TILE_H/2, z], rot: [0, -Math.PI/2, 0] })
-  }
   return <>
-    {positions.map((p, i) => <Tile key={i} position={p.pos} rotation={p.rot} showFace={false} />)}
+    {Array.from({ length: count }).map((_, i) => {
+      const z = (i - (count - 1) / 2) * spacing
+      return <Tile key={i} position={[-TABLE_RADIUS, TILE_H/2, z]} rotation={[0, -Math.PI/2, 0]} isBack={true} />
+    })}
   </>
 }
 
 function WestHand({ count }: { count: number }) {
-  const positions: { pos: [number,number,number]; rot: [number,number,number] }[] = []
   const spacing = TILE_W + 0.05
   
-  for (let i = 0; i < count; i++) {
-    const x = (i - (count - 1) / 2) * spacing
-    positions.push({ pos: [x, TILE_H/2, TABLE_RADIUS], rot: [0, 0, 0] })
-  }
   return <>
-    {positions.map((p, i) => <Tile key={i} position={p.pos} rotation={p.rot} showFace={false} />)}
+    {Array.from({ length: count }).map((_, i) => {
+      const x = (i - (count - 1) / 2) * spacing
+      return <Tile key={i} position={[x, TILE_H/2, TABLE_RADIUS]} rotation={[0, 0, 0]} isBack={true} />
+    })}
   </>
 }
 
 function NorthHand({ count }: { count: number }) {
-  const positions: { pos: [number,number,number]; rot: [number,number,number] }[] = []
   const spacing = TILE_W + 0.05
   
-  for (let i = 0; i < count; i++) {
-    const z = (i - (count - 1) / 2) * spacing
-    positions.push({ pos: [TABLE_RADIUS, TILE_H/2, z], rot: [0, Math.PI/2, 0] })
-  }
   return <>
-    {positions.map((p, i) => <Tile key={i} position={p.pos} rotation={p.rot} showFace={false} />)}
+    {Array.from({ length: count }).map((_, i) => {
+      const z = (i - (count - 1) / 2) * spacing
+      return <Tile key={i} position={[TABLE_RADIUS, TILE_H/2, z]} rotation={[0, Math.PI/2, 0]} isBack={true} />
+    })}
   </>
 }
 
@@ -166,7 +181,7 @@ function Discards({ tiles }: { tiles: Array<{ id: string; suit: string; imagePat
       const visibleCount = Math.min(tiles.slice(-10).length, perRow)
       const x = (col - visibleCount/2 + 0.5) * spacing
       const z = -TABLE_RADIUS + 1.2 + row * (TILE_H + 0.03)
-      return <Tile key={tile.id} position={[x, TILE_H/2, z]} rotation={[0, Math.PI, 0]} tile={tile} showFace={true} />
+      return <Tile key={tile.id} position={[x, TILE_H/2, z]} rotation={[0, Math.PI, 0]} tile={tile} isBack={false} />
     })}
   </>
 }
