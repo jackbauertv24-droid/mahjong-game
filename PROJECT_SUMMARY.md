@@ -2,9 +2,19 @@
 
 ## Project Overview
 
-Built and deployed a Chinese Classical Mahjong demo game as a standalone React application with GitHub Pages hosting.
+Built and deployed a Chinese Classical Mahjong demo game as a standalone React application with GitHub Pages hosting. Now features **dual version** (2D + 3D).
 
 **Live URL:** https://jackbauertv24-droid.github.io/mahjong-game/
+
+---
+
+## Version History
+
+| Version | Description | Date |
+|---------|-------------|------|
+| v1.0 | Initial emoji-based tiles | May 2026 |
+| v1.1 | SVG tiles from FluffyStuff library | May 2026 |
+| v1.2 | **3D version added** (Three.js/R3F) | May 15, 2026 |
 
 ---
 
@@ -32,15 +42,42 @@ Built and deployed a Chinese Classical Mahjong demo game as a standalone React a
 
 ## Technical Decisions
 
+### 2D Version
+
 | Decision | Choice | Reason |
 |----------|--------|--------|
 | Framework | React + Vite + TypeScript | Modern, fast build, type safety |
 | Styling | Tailwind CSS | Utility-first, responsive |
 | State Management | Zustand | Simple, lightweight |
-| Tile Style | Traditional Chinese | User preference |
-| Visual Style | Mahjong Soul-inspired | Anime-ish, 3D effects |
+| Tile Style | SVG from FluffyStuff/riichi-mahjong-tiles | High-quality, open-source (CC0) |
+| Visual Style | Mahjong Soul-inspired | Anime-ish, 3D effects via CSS |
 | Color Scheme | Classic green felt | Traditional table look |
-| Layout | Responsive | Desktop + mobile |
+
+### 3D Version
+
+| Decision | Choice | Reason |
+|----------|--------|--------|
+| 3D Framework | Three.js + React Three Fiber | Declarative 3D in React |
+| Helper Library | @react-three/drei | RoundedBox, useTexture, OrthographicCamera |
+| Tile Geometry | RoundedBoxGeometry | Realistic rounded edges |
+| Tile Faces | SVG textures via useTexture | Reuse existing assets |
+| Tile Backs | Solid green color | Uniform pattern |
+| Camera | Fixed Orthographic (isometric) | No orbit controls per user preference |
+| UI | HTML overlay | Same UI components as 2D, positioned over Canvas |
+| Version Switch | StartScreen with two buttons | Simple, no localStorage memory |
+
+---
+
+## Emoji Mapping Discovery
+
+⚠️ **Critical Finding**: Unicode standard names for mahjong tiles are WRONG for visual mapping.
+
+User verified on their screen:
+- 🀇-🀏 = **WAN (万)** (Unicode says "Bamboo" - incorrect)
+- 🀐-🀘 = **TIAO (条)** (Unicode says "Circles" - incorrect)
+- 🀙-🀡 = **TONG (筒)** (Unicode says "Characters" - incorrect)
+
+This led to adopting SVG tiles from FluffyStuff library instead of relying on emoji.
 
 ---
 
@@ -50,25 +87,99 @@ Built and deployed a Chinese Classical Mahjong demo game as a standalone React a
 mahjong/
 ├── .github/workflows/
 │   └── deploy.yml              # GitHub Pages deployment
+├── public/
+│   └── tiles/
+│       ├── wan/1.svg - 9.svg   # 万 tiles (from Man1-Man9.svg)
+│       ├── tiao/1.svg - 9.svg  # 条 tiles (from Sou1-Sou9.svg)
+│       ├── tong/1.svg - 9.svg  # 筒 tiles (from Pin1-Pin9.svg)
+│       ├── feng/1.svg - 4.svg  # 风 tiles (东南西北)
+│       └── jian/1.svg - 3.svg  # 箭 tiles (中发白)
 ├── src/
 │   ├── components/
-│   │   ├── tiles/              # Tile.tsx, TileBack.tsx
-│   │   ├── table/              # GameTable.tsx, Wall.tsx, DiscardArea.tsx
-│   │   ├── hand/               # PlayerHand.tsx, OpponentHand.tsx
-│   │   └── ui/                 # Header, TurnIndicator, ActionBar
+│   │   ├── tiles/
+│   │   │   ├── Tile.tsx            # 2D tile with SVG <img>
+│   │   │   ├── DiscardTile.tsx     # Smaller discard tile
+│   │   │   └── index.ts
+│   │   ├── table/
+│   │   │   ├── GameTable.tsx       # Main 2D table layout
+│   │   │   ├── Wall.tsx
+│   │   │   ├── DiscardArea.tsx
+│   │   │   └── index.ts
+│   │   ├── hand/
+│   │   │   ├── PlayerHand.tsx      # Interactive player hand
+│   │   │   ├── OpponentHand.tsx    # Opponent hands with backs
+│   │   │   └and index.ts
+│   │   ├── ui/
+│   │   │   ├── Header.tsx
+│   │   │   ├── TurnIndicator.tsx
+│   │   │   ├── ActionBar.tsx
+│   │   │   ├── FloatingActionButton.tsx  # Draw button (抽)
+│   │   │   └and index.ts
+│   │   └── three/                  # 3D components (NEW)
+│   │       ├── GameTable3D.tsx     # Main 3D Canvas scene
+│   │       ├── Tile3D.tsx          # 3D tile mesh
+│   │       ├── TableSurface.tsx    # Green table plane
+│   │       ├── Wall.tsx            # 3D wall stacks
+│   │       ├── DiscardArea.tsx     # 3D discard pile
+│   │       ├── PlayerHand.tsx      # 3D player hand
+│   │       ├── OpponentHand.tsx    # 3D opponent hands
+│   │       └and index.ts
+│   ├── screens/                    # NEW
+│   │   ├── StartScreen.tsx         # 2D/3D version selector
+│   │   └and index.ts
 │   ├── game/
-│   │   ├── tiles.ts            # 144 tile definitions
-│   │   └── flow.ts             # Zustand game state
+│   │   ├── tiles.ts                # 144 tile definitions, imagePath
+│   │   └and flow.ts                # Zustand game state/store
 │   ├── styles/
-│   │   └── index.css           # Tailwind + animations
-│   ├── App.tsx
-│   └── main.tsx
-├── package.json
-├── vite.config.ts              # base: '/mahjong-game/'
-├── tailwind.config.js
-├── tsconfig.json
-└── README.md
+│   │   └and index.css              # Tailwind + animations
+│   ├── App.tsx                     # Version state + conditional render
+│   └and main.tsx
+├── package.json                    # Three.js deps added
+├── vite.config.ts                  # base: '/mahjong-game/'
+├── EMOJI_MAPPING_ANALYSIS.md       # Emoji research documentation
+├── PROJECT_SUMMARY.md              # This file
+└and README.md
 ```
+
+---
+
+## 3D Implementation Details
+
+### Canvas Setup
+
+```tsx
+<Canvas
+  shadows
+  gl={{ antialias: true }}
+  camera={{ position: [12, 12, 12], zoom: 40 }}
+>
+  <Suspense fallback={<LoadingFallback />}>
+    <OrthographicCamera makeDefault position={[12, 12, 12]} zoom={40} />
+    <ambientLight intensity={0.6} />
+    <directionalLight position={[10, 20, 10]} intensity={1} castShadow />
+    {/* 3D components */}
+  </Suspense>
+</Canvas>
+```
+
+### Tile 3D Component (Simplified for Debugging)
+
+```tsx
+<RoundedBox args={[0.7, 1.0, 0.4]} radius={0.05} smoothness={4}>
+  <meshStandardMaterial color={tileColor} />
+</RoundedBox>
+```
+
+**Current Status**: Using colored boxes (no SVG textures yet) to debug Canvas rendering.
+
+### Player Positions in 3D
+
+| Position | Group Position | Rotation |
+|----------|----------------|----------|
+| East (you) | `[0, 0, -3]` | `[0, 0, 0]` |
+| South | `[-3.5, 0, 0]` | `[0, Math.PI/2, 0]` |
+| West | `[0, 0, 3.5]` | `[0, Math.PI, 0]` |
+| North | `[3.5, 0, 0]` | `[0, -Math.PI/2, 0]` |
 
 ---
 
@@ -82,47 +193,27 @@ mahjong/
 | TypeScript errors | Import paths wrong, type mismatches | Fixed imports, added explicit types |
 | GitHub Pages not enabled | Pages not configured | Enabled via GitHub API with workflow build type |
 | Array destructuring error | TypeScript strict mode | Used temp variable swap instead |
+| Invalid Tailwind classes | `h-18`, `w-11` don't exist | Use valid: `h-20`, `w-12` |
+| 3D TypeScript errors | Unused imports, wrong component name | Fixed DiscardArea3D, removed unused vars |
+| 3D blank screen | Canvas height undefined, SVG textures fail | Added explicit height, simplified to colored boxes |
 
-### Workflow Runs
+### Workflow Runs (3D Implementation)
 
-1. **Run 25836977111** - Failed (npm ci error)
-2. **Run 25837037151** - Failed (TypeScript errors)
-3. **Run 25837307197** - Failed (Pages not enabled)
-4. **Run 25837370103** - ✅ Success (after enabling Pages)
-
----
-
-## Deployment Verification
-
-### curl Tests
-
-```bash
-# HTML page
-curl https://jackbauertv24-droid.github.io/mahjong-game/
-# Result: 200 OK - HTML returned with correct title
-
-# JavaScript bundle
-curl https://jackbauertv24-droid.github.io/mahjong-game/assets/index-COAl_F3y.js
-# Result: 200 OK - JS bundle available
-
-# CSS bundle  
-curl https://jackbauertv24-droid.github.io/mahjong-game/assets/index-D12XP09Z.css
-# Result: 200 OK - CSS bundle available
-
-# Favicon
-curl https://jackbauertv24-droid.github.io/mahjong-game/favicon.svg
-# Result: 200 OK - SVG favicon available
-```
-
-All assets deployed successfully.
+| Run ID | Status | Description |
+|--------|--------|-------------|
+| 25899014173 | ✅ Success | 3D fixes: Canvas height, Suspense, simplified tiles |
+| 25896227634 | ✅ Success | TypeScript fixes (DiscardArea3D naming) |
+| 25896145728 | ❌ Failed | TypeScript errors in 3D components |
+| 3505530 | Pushed | Initial 3D version commit |
 
 ---
 
 ## Features Implemented
 
-### Phase 1 (Completed)
+### 2D Version (v1.1 - Stable)
 
 - ✅ Traditional Chinese tile rendering (万筒条风箭)
+- ✅ SVG tiles from FluffyStuff/riichi-mahjong-tiles (CC0)
 - ✅ Mahjong Soul-inspired 3D tile effects with CSS
 - ✅ Classic green felt table background
 - ✅ 4-player table layout (East, South, West, North)
@@ -130,24 +221,41 @@ All assets deployed successfully.
 - ✅ Opponent hands with back-facing tiles
 - ✅ Wall stack visualization
 - ✅ Discard area for all players
-- ✅ Draw button (pick from wall)
+- ✅ Draw button FAB (抽)
 - ✅ Click-to-discard interaction
 - ✅ Turn indicator with animation
 - ✅ Auto-opponent turns (random discard)
 - ✅ Responsive design (desktop + mobile)
 - ✅ GitHub Pages deployment with CI/CD
 
-### Phase 2 (Planned)
+### 3D Version (v1.2 - Beta)
+
+- ✅ StartScreen with 2D/3D version selection
+- ✅ Three.js Canvas with orthographic isometric camera
+- ✅ RoundedBoxGeometry for 3D tiles
+- ✅ Fixed camera (no orbit controls)
+- ✅ HTML overlay UI (same as 2D)
+- ⚠️ Colored boxes (SVG textures pending)
+- ⚠️ Testing/debugging in progress
+
+### Future Phase 2
 
 - Peng/Chi/Gang meld actions
 - Win detection (basic pattern matching)
 - Scoring system
+- SVG texture loading for 3D tiles
 
-### Phase 3+ (Future)
+---
 
-- AI opponent strategy
-- Online multiplayer
-- Sound effects
+## Correct Seating (Clockwise E→S→W→N)
+
+From East (you) perspective:
+
+| Player | Direction | Position | Tile Orientation | Discard Layout |
+|--------|-----------|----------|------------------|----------------|
+| **South** | Downstream (next) | LEFT side | Vertical ↓ | Vertical in front |
+| **West** | Opposite | TOP center | Horizontal → | Horizontal below |
+| **North** | Upstream (previous) | RIGHT side | Vertical ↓ | Vertical in front |
 
 ---
 
@@ -170,19 +278,26 @@ Loop continues until wall empty → Game Over
 
 ---
 
-## Tile Definitions
+## Key Learnings
 
-| Category | Characters | Tiles | Count |
-|----------|------------|-------|-------|
-| Wan (万) | 一二三四五六七八九 | 1-9万 | 36 |
-| Tong (筒) | 一二三四五六七八九 | 1-9筒 | 36 |
-| Tiao (条) | 一二三四五六七八九 | 1-9条 | 36 |
-| Feng (风) | 东南西北 | Winds | 16 |
-| Jian (箭) | 中发白 | Dragons | 12 |
-| Hua (花) | 春夏秋冬 | Flowers | 4 |
-| Ji (季) | 梅兰菊竹 | Seasons | 4 |
+### GitHub Pages & CI/CD
 
-**Total: 144 tiles** ( Flowers/Seasons excluded from gameplay in Phase 1)
+1. **Pages Setup**: Must enable Pages via API or settings before workflow can deploy
+2. **Vite Base Path**: Must set `base: '/repo-name/'` for GitHub Pages subdirectory
+3. **No Local Testing**: All validation via GitHub Actions CI
+
+### React Three Fiber
+
+1. **Canvas Height**: Must have explicit height (aspect ratio alone doesn't work)
+2. **Suspense Placement**: Wrap entire 3D scene, not individual components
+3. **SVG Texture Loading**: `useTexture` may fail silently - need error handling
+4. **OrthographicCamera**: Must set `makeDefault` for camera to work
+5. **Group Positioning**: Use group transforms for positioning multiple tiles
+
+### Tailwind CSS
+
+1. **Invalid Classes**: `h-18`, `h-13`, `w-11`, `w-7` don't exist
+2. **Valid Alternatives**: `h-20`, `h-24`, `h-28`, `h-14`, `h-16`, `w-12`, `w-8`
 
 ---
 
@@ -196,149 +311,17 @@ Loop continues until wall empty → Game Over
 
 ---
 
-## Key Learnings
-
-1. **GitHub Pages Setup**: Must enable Pages via API or settings before workflow can deploy
-2. **Vite Base Path**: Must set `base: '/repo-name/'` for GitHub Pages subdirectory
-3. **TypeScript Strict Mode**: Requires explicit types, no implicit any
-4. **No Local Testing**: All validation via GitHub Actions CI
-
----
-
-## Files Created
-
-Total: 30 files, 1146+ lines
-
-- Configuration: 8 files (package.json, vite.config.ts, tailwind, tsconfig, etc.)
-- Components: 13 files (tiles, table, hand, ui)
-- Game logic: 2 files (tiles.ts, flow.ts)
-- Styles: 1 file (index.css)
-- Assets: 1 file (favicon.svg)
-- Docs: 2 files (README.md, PROJECT_SUMMARY.md)
-- Workflow: 1 file (deploy.yml)
-
----
-
-## Layout Fixes (Phase 1 Post-Deployment)
-
-### Issues Found
-
-After initial deployment, user identified several layout problems:
-
-1. **Wrong seating order** - Players positioned incorrectly relative to East
-2. **Wrong tile orientation** - All opponents showed horizontal tiles
-3. **Simplified discard display** - Discards lacked suit indicator (unreadable)
-4. **Draw button placement** - Centered at top (hard to reach)
-
-### Correct Seating (Clockwise E→S→W→N)
-
-From East (you) perspective:
-
-| Player | Direction | Position | Tile Orientation | Discard Layout |
-|--------|-----------|----------|------------------|----------------|
-| **South** | Downstream (next) | LEFT side | Vertical ↓ | Vertical in front |
-| **West** | Opposite | TOP center | Horizontal → | Horizontal below |
-| **North** | Upstream (previous) | RIGHT side | Vertical ↓ | Vertical in front |
-
-### Fixes Implemented
-
-| File | Change |
-|------|--------|
-| `OpponentHand.tsx` | Corrected positions (south→left, west→top, north→right) and orientations |
-| `DiscardTile.tsx` | New component - full tile display with character + suit |
-| `FloatingActionButton.tsx` | New FAB with Chinese character 抽, fixed bottom-right |
-| `Wall.tsx` | Made more subtle (smaller, 40% opacity) |
-| `DiscardArea.tsx` | Uses DiscardTile, shows last 6 discards |
-| `ActionBar.tsx` | Removed Draw button (moved to FAB) |
-| `GameTable.tsx` | Corrected opponent placement order |
-
-### Visual Changes
-
-```
-Before (Wrong):
-              NORTH (left)    SOUTH (right)
-              [horizontal]    [horizontal]
-              WEST (left)
-              [vertical]
-
-After (Correct):
-              WEST (top - opposite)
-              [horizontal tiles]
-              [horizontal discards below]
-
-SOUTH (left - downstream)    NORTH (right - upstream)
-[vertical tiles ↓]            [vertical tiles ↓]
-[vertical discards]           [vertical discards]
-
-              [Your discards - horizontal]
-              [Your hand - interactive]
-                              [FAB: 抽] (bottom-right)
-```
-
-### Component Structure (Updated)
-
-```
-src/components/
-├── tiles/
-│   ├── Tile.tsx            # Interactive tiles for hand
-│   ├── TileBack.tsx        # Back-facing tiles (exported from Tile.tsx)
-│   ├── DiscardTile.tsx     # NEW: Full tile display for discards
-│   └── index.ts
-├── hand/
-│   ├── PlayerHand.tsx      # Your interactive hand
-│   ├── OpponentHand.tsx    # FIXED: Positions + orientations
-│   └── index.ts
-├── table/
-│   ├── GameTable.tsx       # FIXED: Opponent placement order
-│   ├── Wall.tsx            # UPDATED: More subtle
-│   ├── DiscardArea.tsx     # UPDATED: DiscardTile, last 6
-│   └── index.ts
-├── ui/
-│   ├── Header.tsx
-│   ├── TurnIndicator.tsx
-│   ├── ActionBar.tsx       # UPDATED: Removed Draw button
-│   ├── FloatingActionButton.tsx  # NEW: FAB with 抽
-│   └── index.ts
-```
-
----
-
-## Verification Summary (Latest)
-
-### curl Tests
-
-```bash
-# HTML page - 200 OK
-curl https://jackbauertv24-droid.github.io/mahjong-game/
-
-# JS bundle - 200 OK, contains 抽
-curl https://jackbauertv24-droid.github.io/mahjong-game/assets/index-qeHjskjo.js
-
-# CSS bundle - 200 OK
-curl https://jackbauertv24-droid.github.io/mahjong-game/assets/index-B_C6NLeQ.css
-```
-
-### Deployments History
-
-| Run ID | Status | Description |
-|--------|--------|-------------|
-| 25838939736 | ✅ Success | Layout fixes (seating, FAB, discards) |
-| 25838171635 | ✅ Success | Fixed Start Game button |
-| 25837963056 | ✅ Success | Added summary doc |
-| 25837370103 | ✅ Success | Pages enabled manually |
-| 25837307197 | ❌ Failed | Pages not enabled |
-| 25837037151 | ❌ Failed | TypeScript errors |
-| 25836977111 | ❌ Failed | npm ci error |
-
----
-
 ## Conclusion
 
-Successfully built and deployed a Chinese Classical Mahjong demo game with:
-- Clean React + TypeScript architecture
-- Traditional Chinese tiles with Mahjong Soul-inspired aesthetics
-- Responsive 4-player table layout
-- GitHub Pages hosting with automatic CI/CD
-- No local testing required (safe for production system)
+Successfully built and deployed a dual-version Chinese Classical Mahjong demo:
+- **2D Version**: Stable, using SVG tiles, CSS 3D effects
+- **3D Version**: Beta, using Three.js/R3F, currently debugging
+- **Version Switch**: Simple StartScreen with two buttons
+- **Safe Architecture**: 2D components untouched, 3D isolated in separate directory
 
-**Next steps**: Add Peng/Chi/Gang actions and win detection in Phase 2.
+**Current Status**: 3D version shows blank - investigating Canvas rendering issues. Simplified to colored boxes for debugging.
+
+**Next steps**: 
+1. Debug 3D Canvas rendering
+2. Add SVG texture loading for 3D tiles
+3. Implement Peng/Chi/Gang actions
